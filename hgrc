@@ -1,0 +1,17 @@
+[ui]
+username = Spencer McIntyre
+
+[extensions]
+hgext.highlight =
+hgext.graphlog =
+hgext.convert =
+hgext.extdiff =
+
+[web]
+cacerts = /etc/pki/tls/certs/ca-bundle.crt
+
+[extdiff]
+cmd.extdiff = meld
+
+[web]
+cacerts = /etc/pki/tls/certs/ca-bundle.crt
