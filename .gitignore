@@ -2,3 +2,4 @@
 *.py[cod]
 
 geany/templates/templates.README
+geany/filedefs/filetypes.README
