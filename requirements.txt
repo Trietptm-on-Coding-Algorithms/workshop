@@ -1,0 +1,11 @@
+autopep8>=1.0.1
+dnspython>=1.10.0
+Markdown>=2.3.1
+matplotlib>=1.2.1
+msgpack-python>=0.4.2
+paramiko>=1.10.1
+pygit2>=0.20.3
+PyGithub>=1.24.1
+pylint>=1.2.1
+pyserial>=2.6
+PyYAML>=3.10

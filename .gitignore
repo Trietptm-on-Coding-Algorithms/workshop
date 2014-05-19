@@ -1,0 +1,4 @@
+*.geany
+*.py[cod]
+
+geany/templates/templates.README
