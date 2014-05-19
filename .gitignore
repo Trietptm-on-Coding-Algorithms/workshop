@@ -1,5 +1,7 @@
 *.geany
 *.py[cod]
+.idea/*
 
-geany/templates/templates.README
 geany/filedefs/filetypes.README
+geany/plugins/geanypy/plugins/.loaded_plugins
+geany/templates/templates.README

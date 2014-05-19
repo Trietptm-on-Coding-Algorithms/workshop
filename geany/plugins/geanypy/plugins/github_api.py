@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-#  geany.py
+#  github.py
 #
 #  Copyright 2014 Spencer McIntyre <zeroSteiner@gmail.com>
 #
@@ -50,17 +50,12 @@ def git_fetch(repo, remote_name=None):
 	return proc_h.wait()
 
 class GeanyPlugin(geany.Plugin):
-	__plugin_name__ = 'Geany Misc'
+	__plugin_name__ = 'GitHub'
 	__plugin_version__ = '1.0'
-	__plugin_description__ = 'Miscellaneous IDE Enhancements'
+	__plugin_description__ = 'GitHub API Integration'
 	__plugin_author__ = 'Spencer McIntyre <zeroSteiner@gmail.com>'
 
 	def __init__(self):
-		menu_item = gtk.MenuItem('Regex Debugger')
-		menu_item.show()
-		geany.main_widgets.tools_menu.append(menu_item)
-		menu_item.connect('activate', self.show_uri, 'https://www.debuggex.com/')
-		self.tools_menu_regex_debugger = menu_item
 		self.project_menu_github = None
 		geany.signals.connect('project_open', self.init_project)
 		geany.signals.connect('project_close', self.cleanup_project)
