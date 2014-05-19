@@ -1,0 +1,7 @@
+set PromptTimeFormat %H:%M:%S
+<ruby>
+run_single("loadpath \"#{File.join(Msf::Config.install_root, 'test', 'modules')}\"")
+run_single("set Prompt \"#{File.basename(Msf::Config.install_root)} (S:%red%S%clr J:%red%J%clr)\"")
+</ruby>
+setg VERBOSE true
+setg THREADS 32

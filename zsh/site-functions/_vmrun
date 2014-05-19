@@ -1,0 +1,136 @@
+#compdef vmrun
+
+_vmrun_util_get_running=("${(@f)$(vmrun list | egrep "\.vmx$")}")
+_vmrun_running_cmds=( getGuestIPAddress pause reset stop suspend upgradevm )
+
+_vmrun_util_list_running() {
+	_describe -t running_vm 'running vm' _vmrun_util_get_running || compadd "$@"
+}
+
+_vmrun_cmd_listSnapshots() {
+	local -a _suffix_options
+	_suffix_options=( showTree )
+	if (( $1 == 2 )); then
+		_vmrun_util_list_running
+	elif (( $1 == 3)); then
+		_normal
+	elif (( $1 == 4)); then
+		_describe 'option' _suffix_options || compadd "$@"
+	fi
+}
+
+_vmrun_cmd_snapshot() {
+	if (( $1 == 2 )); then
+		_vmrun_util_list_running
+	elif (( $1 == 3)); then
+		_normal
+	fi
+}
+
+_vmrun_cmd_deleteSnapshot() {
+	local -a _suffix_options
+	_suffix_options=( andDeleteChildren )
+	if (( $1 == 2 )); then
+		_vmrun_util_list_running
+	elif (( $1 == 3)); then
+		_normal
+	elif (( $1 == 4)); then
+		_describe 'option' _suffix_options || compadd "$@"
+	fi
+}
+
+_vmrun_cmd_revertToSnapshot() {
+	if (( $1 == 2 )); then
+		_vmrun_util_list_running
+	elif (( $1 == 3)); then
+		_normal
+	fi
+}
+
+_vmrun_cmd_writeVariable() {
+	local -a _env_types
+	_env_types=( runtimeConfig guestEnv guestVar )
+	if (( $1 == 2 )); then
+		_vmrun_util_list_running
+	elif (( $1 == 3)); then
+		_describe 'var type' _env_types || compadd "$@"
+	elif (( $1 == 4)); then
+		_normal
+	elif (( $1 == 5)); then
+		_normal
+	fi
+}
+
+_vmrun_cmd_readVariable() {
+	local -a _env_types
+	_env_types=( runtimeConfig guestEnv guestVar )
+	if (( $1 == 2 )); then
+		_vmrun_util_list_running
+	elif (( $1 == 3)); then
+		_describe 'var type' _env_types || compadd "$@"
+	elif (( $1 == 4)); then
+		_normal
+	fi
+}
+
+_vmrun_command() {
+	local -a _vmrun_cmds
+	# Descriptions taken from vmrun --help.
+	_vmrun_cmds=(
+		# Power Commands
+		'start:Start a VM or Team'
+		'stop:Stop a VM or Team'
+		'reset:Reset a VM or Team'
+		'suspend:Suspend a VM or Team'
+		'pause:Pause a VM'
+		'unpause:Unpause a VM'
+
+		# Snapshot Commands
+		'listSnapshots:List all snapshots in a VM'
+		'snapshot:Create a snapshot of a VM'
+		'deleteSnapshot:Remove a snapshot from a VM'
+		'revertToSnapshot:Set VM state to a snapshot'
+
+		# Guest OS Commands
+		'listProcessesInGuest:List running processes in Guest OS'
+		'writeVariable:Write a variable in the VM state'
+		'readVariable:Read a variable in the VM state'
+		'getGuestIPAddress:Gets the IP address of the guest'
+
+		# General Commands
+		'list:List all running VMs'
+		'upgradevm:Upgrade VM file format, virtual hw'
+		'installTools:Install Tools in Guest'
+		'checkToolsState:Check the current Tools state'
+		'register:Register a VM'
+		'unregister:Unregister a VM'
+		'listRegisteredVM:List registered VMs'
+		'deleteVM:Delete a VM'
+	)
+
+	if (( CURRENT == 1 )); then
+		_describe "options" _vmrun_cmds
+	else
+		local curcontext="$curcontext"
+		cmd="${${_vmrun_cmds[(r)$words[1]:*]%%:*}}"
+		if (( $#cmd )); then
+			if (( $+functions[_vmrun_cmd_$cmd] )); then
+				_vmrun_cmd_$cmd CURRENT
+			elif [[ -n ${(M)_vmrun_running_cmds:#${cmd}} ]] ; then
+				_vmrun_util_list_running
+			else
+				_files
+			fi
+		else
+			_message "unknown vmrun command: $words[1]"
+		fi
+	fi
+}
+
+_arguments \
+	{-h,--help}'[Show help text]' \
+	'-vp[Encrypted VM password]' \
+	'-gu[Guest username]' \
+	'-gp[Guest password]' \
+	'-T:VMWare host type:(esx player server server1 vc ws)' \
+	'*::vmrun commands:_vmrun_command'

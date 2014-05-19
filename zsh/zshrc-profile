@@ -1,0 +1,17 @@
+# $HOME/.zshrc
+# Lines configured by zsh-newuser-install
+
+autoload -Uz vcs_info
+zstyle ':vcs_info:*' enable hg git
+zstyle ':vcs_info:*' check-for-changes true
+zstyle ':vcs_info:(hg*|git*)' formats "[%s %u:%c %r:%b] "
+
+precmd() { vcs_info }
+setopt prompt_subst
+VCSPROMPT='%{$fg_bold[white]%}${vcs_info_msg_0_}%{$reset_color%}'
+PROMPT="$VCSPROMPT$PROMPT"
+
+PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
+
+# Add Metasploit to the path
+PATH=$PATH:$HOME/repos/msf4-git

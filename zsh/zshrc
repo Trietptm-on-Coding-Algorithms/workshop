@@ -1,0 +1,109 @@
+#
+# /etc/zshrc is sourced in interactive shells.  It
+# should contain commands to set up aliases, functions,
+# options, key bindings, etc.
+#
+
+autoload -U compinit
+compinit
+autoload -U colors
+colors
+
+# Set prompts
+if [ "$(whoami)" = "root" ]; then
+	DEFAULTPROMPT="%{$fg_bold[red]%}[%* %n %c]%# %{$reset_color%}%" # root prompt
+else
+	DEFAULTPROMPT="%{$fg[green]%}[%* %n %c]%# %{$reset_color%}%" # default prompt
+fi
+PROMPT=$DEFAULTPROMPT
+
+bindkey ' ' magic-space  # also do history expansion on space
+
+_src_etc_profile_d()
+{
+	#  Make the *.sh things happier, and have possible ~/.zshenv options like
+	# NOMATCH ignored.
+	emulate -L ksh
+
+	# from bashrc, with zsh fixes
+	if [[ ! -o login ]]; then # We're not a login shell
+		for i in /etc/profile.d/*.sh; do
+		if [ -r "$i" ]; then
+			. $i
+		fi
+		done
+		unset i
+	fi
+}
+_src_etc_profile_d
+
+unset -f _src_etc_profile_d
+unsetopt beep
+
+setopt ALL_EXPORT
+setopt APPEND_HISTORY
+setopt autocd
+setopt CORRECT
+setopt extendedglob
+setopt EXTENDED_HISTORY
+setopt hist_ignore_all_dups
+setopt hist_ignore_space
+setopt MENUCOMPLETE
+
+zstyle ':completion:*:descriptions' format '%U%B%d%b%u'
+zstyle ':completion:*:warnings' format '%BSorry, no matches for: %d%b'
+
+# Aliases
+alias l='ls -lha'
+alias pdb='python -m pdb'
+alias pipupate="for mod in $(pip freeze --local | grep -v '^\-e' | cut -d= -f1); do echo $mod && pip install -U $mod &>/dev/null; done"
+alias prompt-clean='PROMPT="%{$fg[green]%}[%c]%# %{$reset_color%}%"'
+alias pyhttpd='python -m SimpleHTTPServer'
+alias python-clean="find . -type f -regex \".*\\.pyc$\" -exec rm -f '{}' \;"
+alias regrep='egrep -Hnr'
+alias rsync='rsync -P'
+alias vmsuspend='vmrun list | egrep ".*\.vmx$" | while read vm; do echo "suspending $vm"; vmrun suspend $vm; done'
+alias xclipout='xclip -o -selection clipboard'
+
+# Functions
+github-clone() {
+	git clone git@github.com:$1.git
+}
+
+hashfile() {
+	for file in "$@"; do
+		echo "hashing: $file";
+		echo "file: $file" > $file.hash;
+		echo "md5:  $(md5sum $file | awk '{print $file}')" >> $file.hash;
+		echo "sha1: $(sha1sum $file | awk '{print $file}')" >> $file.hash;
+	done
+}
+
+python-install() {
+	if [ -a requirements.txt ]; then
+		pip install -r requirements.txt
+	fi
+	if [ -a setup.py ]; then
+		python setup.py build
+		sudo python setup.py install
+	else
+		echo $fg[red]"No setup.py file found"$reset_color
+	fi
+	rm -rf build
+}
+
+python-test() {
+	if [ ! -d tests ]; then
+		echo $fg[red]"No tests directory found"$reset_color
+		return 0
+	fi
+	python -m unittest -v tests
+	if [ $? -eq 0 ]; then
+		echo "All tests completed successfully"
+	else
+		echo $fg[red]"Tests did not complete successfully"$reset_color
+	fi
+}
+
+# Run this for RVM
+[[ -s "$HOME/.rvm/scripts/rvm" ]] && . "$HOME/.rvm/scripts/rvm"

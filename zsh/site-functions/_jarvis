@@ -1,0 +1,37 @@
+#compdef jarvis
+
+_jarvis_command() {
+	local -a _jarvis_cmds
+	# Descriptions taken from jarvis --help.
+	_jarvis_cmds=(
+		'hexdump:Dump a binary files content in hex'
+		'codedump:Dump a binary files content in a code format'
+		'ropsummary:Get a summary of useful gadgets form a rop file'
+		'cyclicpattern:Create and find a pattern in a cyclic pattern'
+		'disassemble:Disassemble a raw binary file'
+		'assemble:Assemble a source file'
+	)
+
+	if (( CURRENT == 1 )); then
+		_describe "options" _jarvis_cmds
+	else
+		local curcontext="$curcontext"
+		cmd="${${_jarvis_cmds[(r)$words[1]:*]%%:*}}"
+		if (( $#cmd )); then
+			if (( $+functions[_jarvis_cmd_$cmd] )); then
+				_jarvis_cmd_$cmd CURRENT
+			else
+				_files
+			fi
+		else
+			_message "unknown jarvis command: $words[1]"
+		fi
+	fi
+}
+
+_arguments \
+	{-h,--help}'[Show help text]' \
+	{-v,--version}'[Show version information]' \
+	{-V,--verbose}'[Enable verbose output]' \
+	{-f,--format}':Output format:(code python raw ruby)' \
+	'*::jarvis commands:_jarvis_command'

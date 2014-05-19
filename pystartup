@@ -1,0 +1,81 @@
+# ~/.pythonrc
+# enable syntax completion
+
+import atexit
+import os
+import sys
+import logging
+import socket
+from struct import pack, unpack
+
+try:
+	import jarvis
+except ImportError:
+	pass
+else:
+	jar = jarvis.Jarvis()
+
+try:
+	import readline
+except ImportError:
+	print("[-] Module readline not available.")
+else:
+	import rlcompleter
+	readline.parse_and_bind("tab: complete")
+history_file = os.path.expanduser("~/.pyhistory")
+
+def save_history():
+	readline.write_history_file(history_file)
+atexit.register(save_history)
+
+if os.path.exists(history_file):
+	readline.read_history_file(history_file)
+
+console = logging.StreamHandler()
+console.setFormatter(logging.Formatter("%(levelname)-10s: %(message)s"))
+logging.getLogger('').addHandler(console)
+logging.getLogger('').setLevel(logging.INFO)
+
+def set_log_level(level):
+	logging.getLogger('').setLevel(getattr(logging, level))
+
+class _LS():
+	def __repr__(self):
+		return '\n'.join(os.listdir('.'))
+	def __call__(self):
+		return os.listdir('.')
+ls = _LS()
+
+class _PS1():
+	def __str__(self):
+		return "{0} > ".format(os.path.basename(os.getcwd()))
+sys.ps1 = _PS1()
+
+def search_object(string, obj, maxdepth=5, prefix='', skip_underscores=True):
+	if hasattr(obj, '__name__'):
+		obj_name = obj.__name__
+	elif hasattr(obj, '__class__'):
+		obj_name = obj.__class__.__name__
+	elif len(prefix):
+		return
+	else:
+		raise Exception('unknown object name')
+	prefix = (prefix or obj_name)
+	for subobj in dir(obj):
+		if skip_underscores and subobj.startswith('_'):
+			continue
+		subobj_id = '.'.join((prefix, subobj))
+		if string in subobj:
+			print(subobj_id)
+		if not hasattr(obj, subobj):
+			continue
+		subobj = getattr(obj, subobj)
+		if not type(subobj).__name__ in dir(__builtins__) and maxdepth > 0:
+			search_object(string, subobj, (maxdepth - 1), subobj_id, skip_underscores)
+
+del atexit
+del _LS
+del _PS1
+del save_history
+
+print("PID: {0} UID: {1} GID: {2}".format(os.getpid(), os.getuid(), os.getgid()))

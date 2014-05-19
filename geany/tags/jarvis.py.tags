@@ -1,0 +1,18 @@
+# format=pipe
+build_argparser||(description = '', version = 0.1, use_logging = False)|
+create_cyclic_pattern||(size)|
+Jarvis||(use_colors = DEFAULT, stream = None, verbose = True)|
+mute||()|
+print_code_dump||(data, block_size = 64, hexlify = True, varname = 'data', flavor = 'python', include_crc = False)|
+print_error||(message, stream = None)|
+print_good||(message, stream = None)|
+print_hexdump||(data, base = 0)|
+print_line||(message, stream = None)|
+print_operation_time||(message = None, verbose = False, stream = None)|
+print_status||(message, stream = None)|
+print_table||(rows, verbose = False, stream = None, spaces = 2)|
+unmute||()|
+vprint_error||(*args, **kwargs)|
+vprint_good||(*args, **kwargs)|
+vprint_line||(*args, **kwargs)|
+vprint_status||(*args, **kwargs)|
