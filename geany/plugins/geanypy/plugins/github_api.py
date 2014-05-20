@@ -55,7 +55,7 @@ class GeanyPlugin(geany.Plugin):
 	__plugin_author__ = 'Spencer McIntyre <zeroSteiner@gmail.com>'
 
 	def __init__(self):
-		self.config = workshop.configuration.Configuration(os.environ['$WORKSHOP_CONFIG'], 'geanypy_plugins.github_api')
+		self.config = workshop.configuration.Configuration(os.environ['WORKSHOP_CONFIG'], 'geanypy_plugins.github_api')
 		self.project_menu_github = None
 		geany.signals.connect('project_open', self.init_project)
 		geany.signals.connect('project_close', self.cleanup_project)
