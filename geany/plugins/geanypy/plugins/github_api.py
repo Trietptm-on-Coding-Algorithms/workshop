@@ -35,14 +35,13 @@ import geany
 
 import github
 import pygit2
-import utilities
+import workshop
+import workshop.configuration
 
-# Default remote search order
-GITHUB_REMOTE_NAMES = ('github', 'origin', 'upstream')
 REGEX_GITHUB = re.compile('^(git@|https://)github.com[:/]([\w-]+/[\w\-\.]+).git$', flags=re.IGNORECASE)
 
 def git_fetch(repo, remote_name=None):
-	if not utilities.which('git'):
+	if not workshop.which('git'):
 		return
 	remote_name = (remote_name or '--all')
 	args = ['git', 'fetch', remote_name]
@@ -56,6 +55,7 @@ class GeanyPlugin(geany.Plugin):
 	__plugin_author__ = 'Spencer McIntyre <zeroSteiner@gmail.com>'
 
 	def __init__(self):
+		self.config = workshop.configuration.Configuration(os.environ['$WORKSHOP_CONFIG'], 'geanypy_plugins.github_api')
 		self.project_menu_github = None
 		geany.signals.connect('project_open', self.init_project)
 		geany.signals.connect('project_close', self.cleanup_project)
@@ -73,7 +73,7 @@ class GeanyPlugin(geany.Plugin):
 			self.project_menu_github = menu_item
 			self.project_menu_github_menu = submenu_github
 
-			for remote_name in GITHUB_REMOTE_NAMES:
+			for remote_name in self.config.get('remote_names'):
 				gh_slug = self.project_github_get_slug(remote_name)
 				if not gh_slug:
 					continue
@@ -112,7 +112,7 @@ class GeanyPlugin(geany.Plugin):
 					menu_item = gtk.MenuItem(pr_title)
 					gh_pr_submenu.append(menu_item)
 					menu_item.connect('activate', lambda _, prn, remote_name: self.project_github_open_pr(prn, remote_name), pr.number, remote_name)
-					if prs == 50:
+					if prs == self.config.get('max_prs'):
 						break
 				if prs:
 					menu_item = gtk.MenuItem('Pull Requests')
@@ -179,7 +179,7 @@ class GeanyPlugin(geany.Plugin):
 		if name:
 			remote_names = [name]
 		else:
-			remote_names = GITHUB_REMOTE_NAMES
+			remote_names = self.config.get('remote_names')
 		for remote_name in remote_names:
 			remote = self.project_git_get_remote(remote_name)
 			if not remote:

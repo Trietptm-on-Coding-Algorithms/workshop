@@ -10,7 +10,7 @@ autoload -U colors
 colors
 
 # Set prompts
-if [ "$(whoami)" = "root" ]; then
+if [ "$(whoami)" = 'root' ]; then
 	DEFAULTPROMPT="%{$fg_bold[red]%}[%* %n %c]%# %{$reset_color%}%" # root prompt
 else
 	DEFAULTPROMPT="%{$fg[green]%}[%* %n %c]%# %{$reset_color%}%" # default prompt
@@ -40,15 +40,14 @@ _src_etc_profile_d
 unset -f _src_etc_profile_d
 unsetopt beep
 
-setopt ALL_EXPORT
-setopt APPEND_HISTORY
+setopt append_history
 setopt autocd
-setopt CORRECT
+setopt correct
 setopt extendedglob
-setopt EXTENDED_HISTORY
+setopt extended_history
 setopt hist_ignore_all_dups
 setopt hist_ignore_space
-setopt MENUCOMPLETE
+setopt menucomplete
 
 zstyle ':completion:*:descriptions' format '%U%B%d%b%u'
 zstyle ':completion:*:warnings' format '%BSorry, no matches for: %d%b'
@@ -80,10 +79,10 @@ hashfile() {
 }
 
 python-install() {
-	if [ -a requirements.txt ]; then
+	if [ -f "requirements.txt" ]; then
 		pip install -r requirements.txt
 	fi
-	if [ -a setup.py ]; then
+	if [ -f "setup.py" ]; then
 		python setup.py build
 		sudo python setup.py install
 	else
@@ -93,7 +92,7 @@ python-install() {
 }
 
 python-test() {
-	if [ ! -d tests ]; then
+	if [ ! -d "tests" ]; then
 		echo $fg[red]"No tests directory found"$reset_color
 		return 0
 	fi

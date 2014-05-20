@@ -9,3 +9,4 @@ PyGithub>=1.24.1
 pylint>=1.2.1
 pyserial>=2.6
 PyYAML>=3.10
+git+git://github.com/zeroSteiner/workshop-python@master

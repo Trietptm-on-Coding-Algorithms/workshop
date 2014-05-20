@@ -1,0 +1,7 @@
+geanypy_plugins:
+  github_api:
+    max_prs: 50
+    remote_names:
+      - github
+      - origin
+      - upstream

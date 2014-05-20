@@ -77,5 +77,5 @@ EX_01_LB=Debug
 EX_01_CM=python -m pdb "%f"
 EX_01_WD=
 FT_01_LB=Check Refactor
-FT_01_CM=autopep8 --ignore=E101,E128,E241,E26,E27,E301,E302,E309,E501 --diff "%f"
+FT_01_CM=autopep8 --ignore=E101,E124,E128,E241,E26,E27,E301,E302,E309,E501 --diff "%f"
 FT_01_WD=
