@@ -27,6 +27,12 @@
 	changed = bold red
 	untracked = bold cyan
 
+[core]
+	excludesfile = ~/.gitignore
+
+[merge]
+	tool = meld
+
 [push]
 	default = simple
 
@@ -35,7 +41,3 @@
 	email = zeroSteiner@gmail.com
 	signingkey = A5E15412
 
-[merge]
-	tool = meld
-[core]
-	excludesfile = ~/.gitignore

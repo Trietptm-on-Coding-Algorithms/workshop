@@ -3,6 +3,8 @@ autoload colors
 if [ "$terminfo[colors]" -gt 8 ]; then
 	colors
 fi
+cd "$(git rev-parse --show-toplevel)"
+
 git config --unset alias.autofix
 STAGED_FILES="$(git diff --name-only --cached)"
 if [ -z "$STAGED_FILES" ]; then
