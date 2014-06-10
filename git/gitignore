@@ -1,2 +1,4 @@
 # Geany project files
 *.geany
+
+docs/build

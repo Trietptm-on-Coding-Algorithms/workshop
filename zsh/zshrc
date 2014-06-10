@@ -92,8 +92,8 @@ python-install() {
 }
 
 python-test() {
-	if [ ! -d "tests" ]; then
-		echo $fg[red]"No tests directory found"$reset_color
+	if [ ! -f "tests.py" -a ! -f "tests/__init__.py" ]; then
+		echo $fg[red]"No python unit tests found"$reset_color
 		return 0
 	fi
 	python -m unittest -v tests
