@@ -1,6 +1,7 @@
 [alias]
 	branch-current = !"git branch | awk '/^\\*/ {print $2}' #"
 	diffstat = diff --stat -r
+	log-today = log --since="6am"
 	log-unpushed = log @{upstream}..HEAD
 	patch-apply = !"patch -p0 < $1 #"
 	patch-make = !"git diff --no-prefix > $1 #"
