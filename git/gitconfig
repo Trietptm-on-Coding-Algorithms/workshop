@@ -42,3 +42,5 @@
 	email = zeroSteiner@gmail.com
 	signingkey = A5E15412
 
+[fetch]
+	prune = true

@@ -3,7 +3,8 @@ autoload colors
 if [ "$terminfo[colors]" -gt 8 ]; then
 	colors
 fi
-cd "$(git rev-parse --show-toplevel)"
+REPO_DIRECTORY="$(git rev-parse --show-toplevel)"
+cd "$REPO_DIRECTORY"
 
 git config --unset alias.autofix
 STAGED_FILES="$(git diff --name-only --cached)"
@@ -41,8 +42,8 @@ if [ ! -z "$STAGED_FILES_PYTHON" ]; then
 		PATCH_FILE=$(mktemp)
 		echo $PEP_LINES > $PATCH_FILE
 		print_status "Patch file $PATCH_FILE created"
-		print_status "Review and apply with \"git autofix\""
-		git config alias.autofix "!if [ -a $PATCH_FILE ]; then patch -p1 < $PATCH_FILE; fi; git config --unset alias.autofix"
+		print_status "Review and apply with \"git autofix\", or ignore with \"git commit -n\""
+		git config alias.autofix "!workshop-git-autofix \"$REPO_DIRECTORY\" \"$PATCH_FILE\"; git config --unset alias.autofix"
 		exit 1
 	fi
 

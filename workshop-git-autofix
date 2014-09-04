@@ -1,0 +1,15 @@
+#!/usr/bin/zsh
+autoload colors
+if [ "$terminfo[colors]" -gt 8 ]; then
+	colors
+fi
+REPO_DIRECTORY="$1"
+PATCH_FILE="$2"
+
+cd "$REPO_DIRECTORY"
+
+if [ ! -z "$PATCH_FILE" -a -e "$PATCH_FILE" ]; then
+	print_status "applying patch file $PATCH_FILE"
+	patch -p1 < "$PATCH_FILE"
+	xargs git add <<< $(egrep '+++ fixed/' $PATCH_FILE | sed 's/+++ fixed\///')
+fi
