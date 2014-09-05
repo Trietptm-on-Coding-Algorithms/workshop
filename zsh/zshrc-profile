@@ -11,7 +11,7 @@ setopt prompt_subst
 VCSPROMPT='%{$fg_bold[white]%}${vcs_info_msg_0_}%{$reset_color%}'
 PROMPT="$VCSPROMPT$PROMPT"
 
-PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
+[[ -d $HOME/.bin ]] && PATH=$PATH:$HOME/.bin
 
 # Add Metasploit to the path
 PATH=$PATH:$HOME/repos/msf4-git
