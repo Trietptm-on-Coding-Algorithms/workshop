@@ -71,10 +71,13 @@ github-clone() {
 
 hashfile() {
 	for file in "$@"; do
-		echo "hashing: $file";
-		echo "file: $file" > $file.hash;
-		echo "md5:  $(md5sum $file | awk '{print $file}')" >> $file.hash;
-		echo "sha1: $(sha1sum $file | awk '{print $file}')" >> $file.hash;
+		if [ -f "$file" ]; then
+			echo "hashing: $file";
+			echo "md5  $file $(md5sum $file | awk '{print $1}')";
+			echo "sha1 $file $(sha1sum $file | awk '{print $1}')";
+		else
+			echo "invalid file: $file"
+		fi
 	done
 }
 
