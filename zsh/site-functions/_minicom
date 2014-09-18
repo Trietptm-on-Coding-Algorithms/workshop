@@ -1,0 +1,34 @@
+#compdef minicom
+
+_minicom_configuration_files=("${(@f)$(ls /etc/minirc.* | sed 's/^\/etc\/minirc\.//')}")
+
+_minicom_configuration() {
+	_describe -t files 'configuration file' _minicom_configuration_files || compadd "$@"
+}
+
+_arguments \
+	{-b,--baudrate}"[set baudrate (ignore the value from config)]" \
+	{-D,--device}"[set device name (ignore the value from config)]" \
+	{-s,--setup}"[enter setup mode]" \
+	{-o,--noinit}"[do not initialize modem & lockfiles at startup]" \
+	{-m,--metakey}"[use meta or alt key for commands]" \
+	{-M,--metakey8}"[use 8bit meta key for commands]" \
+	{-l,--ansi}"[literal; assume screen uses non IBM-PC character set]" \
+	{-L,--iso}"[don't assume screen uses ISO8859]" \
+	{-w,--wrap}"[Linewrap on]" \
+	{-H,--displayhex}"[display output in hex]" \
+	{-z,--statline}"[try to use terminal's status line]" \
+	{-7,--7bit}"[force 7bit mode]" \
+	{-8,--8bit}"[force 8bit mode]" \
+	{-c,--color=on/off}"[ANSI style color usage on or off]" \
+	{-a,--attrib=on/off}"[use reverse or highlight attributes on or off]" \
+	{-t,--term=TERM}"[override TERM environment variable]" \
+	{-S,--script=SCRIPT}"[run SCRIPT at startup]" \
+	{-d,--dial=ENTRY}"[dial ENTRY from the dialing directory]" \
+	{-p,--ptty=TTYP}"[connect to pseudo terminal]" \
+	{-C,--capturefile=FILE}"[art capturing to FILE]" \
+	{-T,--disabletime}"[disable display of online time]" \
+	{-R,--remotecharset}"[character set of communication partner]" \
+	{-v,--version}"[output version information and exit]" \
+	{-h,--help}"[show help]" \
+	"*::minicom configuration:_minicom_configuration"
