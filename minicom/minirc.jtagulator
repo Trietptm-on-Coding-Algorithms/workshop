@@ -1,3 +1,4 @@
 # Machine-generated file - use "minicom -s" to change parameters.
 pu port             /dev/jtagulator
-pu rtscts           No 
+pu rtscts           No
+pu localecho        Yes

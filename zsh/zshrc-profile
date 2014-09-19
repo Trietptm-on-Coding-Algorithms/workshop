@@ -12,6 +12,7 @@ VCSPROMPT='%{$fg_bold[white]%}${vcs_info_msg_0_}%{$reset_color%}'
 PROMPT="$VCSPROMPT$PROMPT"
 
 [[ -d $HOME/.bin ]] && PATH=$PATH:$HOME/.bin
+[[ -f $HOME/.zshrc-local ]] && source $HOME/.zshrc-local
 
 # Add Metasploit to the path
 PATH=$PATH:$HOME/repos/msf-git
