@@ -2,7 +2,7 @@
 
 _arguments \
 	"-a[The architecture to encode as]:architecture:(cmd generic mipsbe mipsle php ppc sparc x64 x86)" \
-	"-b[The list of characters to avoid: '\x00\xff']:bad characters" \
+	"-b[The list of characters to avoid, example: '\x00\xff']:bad characters" \
 	"-c[The number of times to encode the data]:times" \
 	"-d[Specify the directory in which to look for EXE templates]:template file:_files -/" \
 	"-e[The encoder to use]:encoder" \
