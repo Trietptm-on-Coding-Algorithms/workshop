@@ -3,16 +3,16 @@
 _arguments \
 	"-d[Execute the console as defanged]" \
 	"-r[Execute the specified resource file]:resource file:_files" \
-	"-o[Output to the specified file]:output file:_normal" \
+	"-o[Output to the specified file]:output file" \
 	"-c[Load the specified configuration file]:config file:_files" \
-	"-m[Specifies an additional module search path]:search path:_path_files -/" \
+	"-m[Specifies an additional module search path]:search path:_files -/" \
 	"-p[Load a plugin on startup]:plugin file:_files" \
 	{-y,--yaml}"[Specify a YAML file containing database settings]:yaml file:_files" \
-	{-M,--migration-path}"[Specify a directory containing additional DB migrations]:directory:_path_files -/" \
+	{-M,--migration-path}"[Specify a directory containing additional DB migrations]:directory:_files -/" \
 	{-e,--environment}"[Specify the database environment to load from the YAML]:environment:(production development)" \
 	{-v,--version}"[Show version]" \
 	{-L,--real-readline}"[Use the system Readline library instead of RbReadline]" \
 	{-n,--no-database}"[Disable database support]" \
 	{-q,--quiet}"[Do not print the banner on start up]" \
-	"-x[Execute the specified strong as console commands]:commands:_normal" \
+	"-x[Execute the specified strong as console commands]:commands" \
 	{-h,--help}"[Show help text]"

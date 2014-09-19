@@ -14,4 +14,4 @@ PROMPT="$VCSPROMPT$PROMPT"
 [[ -d $HOME/.bin ]] && PATH=$PATH:$HOME/.bin
 
 # Add Metasploit to the path
-PATH=$PATH:$HOME/repos/msf4-git
+PATH=$PATH:$HOME/repos/msf-git
