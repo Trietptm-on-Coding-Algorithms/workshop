@@ -1,34 +1,72 @@
 #compdef minicom
+# ------------------------------------------------------------------------------
+# Copyright (c) 2014 Spencer McIntyre
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#   * Redistributions of source code must retain the above copyright
+#     notice, this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright
+#     notice, this list of conditions and the following disclaimer in the
+#     documentation and/or other materials provided with the distribution.
+#   * Neither the name of the project nor the
+#     names of its contributors may be used to endorse or promote products
+#     derived from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL ZSH-USERS BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# ------------------------------------------------------------------------------
+# Description
+# -----------
+#
+#  Completion script for minicom.
+#
+# ------------------------------------------------------------------------------
+# Authors
+# -------
+#
+#  * Spencer McIntyre
+#
+# ------------------------------------------------------------------------------
 
 _minicom_configuration_files=("${(@f)$(ls /etc/minirc.* | sed 's/^\/etc\/minirc\.//')}")
 
 _minicom_configuration() {
-	_describe -t files 'configuration file' _minicom_configuration_files || compadd "$@"
+  _describe -t files 'configuration file' _minicom_configuration_files || compadd "$@"
 }
 
 _arguments \
-	{-b,--baudrate}"[set baudrate (ignore the value from config)]" \
-	{-D,--device}"[set device name (ignore the value from config)]" \
-	{-s,--setup}"[enter setup mode]" \
-	{-o,--noinit}"[do not initialize modem & lockfiles at startup]" \
-	{-m,--metakey}"[use meta or alt key for commands]" \
-	{-M,--metakey8}"[use 8bit meta key for commands]" \
-	{-l,--ansi}"[literal; assume screen uses non IBM-PC character set]" \
-	{-L,--iso}"[don't assume screen uses ISO8859]" \
-	{-w,--wrap}"[Linewrap on]" \
-	{-H,--displayhex}"[display output in hex]" \
-	{-z,--statline}"[try to use terminal's status line]" \
-	{-7,--7bit}"[force 7bit mode]" \
-	{-8,--8bit}"[force 8bit mode]" \
-	{-c,--color=on/off}"[ANSI style color usage on or off]" \
-	{-a,--attrib=on/off}"[use reverse or highlight attributes on or off]" \
-	{-t,--term=TERM}"[override TERM environment variable]" \
-	{-S,--script=SCRIPT}"[run SCRIPT at startup]" \
-	{-d,--dial=ENTRY}"[dial ENTRY from the dialing directory]" \
-	{-p,--ptty=TTYP}"[connect to pseudo terminal]" \
-	{-C,--capturefile=FILE}"[art capturing to FILE]" \
-	{-T,--disabletime}"[disable display of online time]" \
-	{-R,--remotecharset}"[character set of communication partner]" \
-	{-v,--version}"[output version information and exit]" \
-	{-h,--help}"[show help]" \
-	"*::minicom configuration:_minicom_configuration"
+  {-b,--baudrate}"[set baudrate (ignore the value from config)]" \
+  {-D,--device}"[set device name (ignore the value from config)]" \
+  {-s,--setup}"[enter setup mode]" \
+  {-o,--noinit}"[do not initialize modem & lockfiles at startup]" \
+  {-m,--metakey}"[use meta or alt key for commands]" \
+  {-M,--metakey8}"[use 8bit meta key for commands]" \
+  {-l,--ansi}"[literal; assume screen uses non IBM-PC character set]" \
+  {-L,--iso}"[don't assume screen uses ISO8859]" \
+  {-w,--wrap}"[Linewrap on]" \
+  {-H,--displayhex}"[display output in hex]" \
+  {-z,--statline}"[try to use terminal's status line]" \
+  {-7,--7bit}"[force 7bit mode]" \
+  {-8,--8bit}"[force 8bit mode]" \
+  {-c,--color=on/off}"[ANSI style color usage on or off]" \
+  {-a,--attrib=on/off}"[use reverse or highlight attributes on or off]" \
+  {-t,--term=TERM}"[override TERM environment variable]" \
+  {-S,--script=SCRIPT}"[run SCRIPT at startup]" \
+  {-d,--dial=ENTRY}"[dial ENTRY from the dialing directory]" \
+  {-p,--ptty=TTYP}"[connect to pseudo terminal]" \
+  {-C,--capturefile=FILE}"[art capturing to FILE]" \
+  {-T,--disabletime}"[disable display of online time]" \
+  {-R,--remotecharset}"[character set of communication partner]" \
+  {-v,--version}"[output version information and exit]" \
+  {-h,--help}"[show help]" \
+  "*::minicom configuration:_minicom_configuration"

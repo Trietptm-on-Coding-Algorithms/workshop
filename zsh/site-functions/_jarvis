@@ -1,37 +1,75 @@
 #compdef jarvis
+# ------------------------------------------------------------------------------
+# Copyright (c) 2014 Spencer McIntyre
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#   * Redistributions of source code must retain the above copyright
+#     notice, this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright
+#     notice, this list of conditions and the following disclaimer in the
+#     documentation and/or other materials provided with the distribution.
+#   * Neither the name of the project nor the
+#     names of its contributors may be used to endorse or promote products
+#     derived from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL ZSH-USERS BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# ------------------------------------------------------------------------------
+# Description
+# -----------
+#
+#  Completion script for jarvis (https://gist.github.com/zeroSteiner/7920683).
+#
+# ------------------------------------------------------------------------------
+# Authors
+# -------
+#
+#  * Spencer McIntyre
+#
+# ------------------------------------------------------------------------------
 
 _jarvis_command() {
-	local -a _jarvis_cmds
-	# Descriptions taken from jarvis --help.
-	_jarvis_cmds=(
-		'hexdump:Dump a binary files content in hex'
-		'codedump:Dump a binary files content in a code format'
-		'ropsummary:Get a summary of useful gadgets form a rop file'
-		'cyclicpattern:Create and find a pattern in a cyclic pattern'
-		'disassemble:Disassemble a raw binary file'
-		'assemble:Assemble a source file'
-	)
+  local -a _jarvis_cmds
+  # Descriptions taken from jarvis --help.
+  _jarvis_cmds=(
+    'hexdump:Dump a binary files content in hex'
+    'codedump:Dump a binary files content in a code format'
+    'ropsummary:Get a summary of useful gadgets form a rop file'
+    'cyclicpattern:Create and find a pattern in a cyclic pattern'
+    'disassemble:Disassemble a raw binary file'
+    'assemble:Assemble a source file'
+  )
 
-	if (( CURRENT == 1 )); then
-		_describe "options" _jarvis_cmds
-	else
-		local curcontext="$curcontext"
-		cmd="${${_jarvis_cmds[(r)$words[1]:*]%%:*}}"
-		if (( $#cmd )); then
-			if (( $+functions[_jarvis_cmd_$cmd] )); then
-				_jarvis_cmd_$cmd CURRENT
-			else
-				_files
-			fi
-		else
-			_message "unknown jarvis command: $words[1]"
-		fi
-	fi
+  if (( CURRENT == 1 )); then
+    _describe "options" _jarvis_cmds
+  else
+    local curcontext="$curcontext"
+    cmd="${${_jarvis_cmds[(r)$words[1]:*]%%:*}}"
+    if (( $#cmd )); then
+      if (( $+functions[_jarvis_cmd_$cmd] )); then
+        _jarvis_cmd_$cmd CURRENT
+      else
+        _files
+      fi
+    else
+      _message "unknown jarvis command: $words[1]"
+    fi
+  fi
 }
 
 _arguments \
-	{-h,--help}'[Show help text]' \
-	{-v,--version}'[Show version information]' \
-	{-V,--verbose}'[Enable verbose output]' \
-	{-f,--format}':Output format:(code python raw ruby)' \
-	'*::jarvis commands:_jarvis_command'
+  {-h,--help}'[Show help text]' \
+  {-v,--version}'[Show version information]' \
+  {-V,--verbose}'[Enable verbose output]' \
+  {-f,--format}':Output format:(code python raw ruby)' \
+  '*::jarvis commands:_jarvis_command'
