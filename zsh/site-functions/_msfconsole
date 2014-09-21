@@ -40,18 +40,19 @@
 # ------------------------------------------------------------------------------
 
 _arguments \
-  "-d[Execute the console as defanged]" \
-  "-r[Execute the specified resource file]:resource file:_files" \
-  "-o[Output to the specified file]:output file" \
-  "-c[Load the specified configuration file]:config file:_files" \
-  "-m[Specifies an additional module search path]:search path:_files -/" \
-  "-p[Load a plugin on startup]:plugin file:_files" \
-  {-y,--yaml}"[Specify a YAML file containing database settings]:yaml file:_files" \
-  {-M,--migration-path}"[Specify a directory containing additional DB migrations]:directory:_files -/" \
-  {-e,--environment}"[Specify the database environment to load from the YAML]:environment:(production development)" \
-  {-v,--version}"[Show version]" \
+  {-a,--ask}"[Ask before exiting Metasploit or accept 'exit -y']" \
+  "-c[Load the specified configuration file]:configuration file:_files" \
+  {-d,--defanged}"[Execute the console as defanged]" \
+  {-E,--environment}"[Specify the database environment to load from the configuration]:environment:(production development)" \
+  {-h,--help}"[Show help text]" \
   {-L,--real-readline}"[Use the system Readline library instead of RbReadline]" \
+  {-M,--migration-path}"[Specify a directory containing additional DB migrations]:directory:_files -/" \
+  {-m,--module-path}"[Specifies an additional module search path]:search path:_files -/" \
   {-n,--no-database}"[Disable database support]" \
+  {-o,--output}"[Output to the specified file]:output file" \
+  {-p,--plugin}"[Load a plugin on startup]:plugin file:_files" \
   {-q,--quiet}"[Do not print the banner on start up]" \
-  "-x[Execute the specified string as console commands]:commands" \
-  {-h,--help}"[Show help text]"
+  {-r,--resource}"[Execute the specified resource file]:resource file:_files" \
+  {-v,--version}"[Show version]" \
+  {-x,--execute-command}"[Execute the specified string as console commands]:commands" \
+  {-y,--yaml}"[Specify a YAML file containing database settings]:yaml file:_files"
