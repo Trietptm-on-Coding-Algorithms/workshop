@@ -1,18 +1,18 @@
 background yes
 font Bitstream Vera Sans:size=9
 xftfont Bitstream Vera Sans:size=9
+use_xft yes
 update_interval 1.0
 total_run_times 0
 own_window yes
 own_window_type background
-own_window_transparent yes
+own_window_transparent no
 own_window_hints undecorated,below,sticky,skip_taskbar,skip_pager
 double_buffer yes
 draw_shades no
 draw_outline yes
 draw_graph_borders yes
-minimum_size 300
-maximum_width 310
+minimum_size 325 600
 alignment bottom_left
 gap_x 25
 gap_y 25
@@ -20,7 +20,8 @@ gap_y 25
 TEXT
 $alignc Kernel: $kernel
 $alignc Uptime: $uptime
-${font DejaVuSans:Condensed:Bold:size=20}${tztime}${font}
+${font DejaVuSans:Condensed:Bold:size=20}${tztime}${font Bitstream Vera Sans:size=9}
+
 Core1:$alignr ${cpu cpu1}%@${freq_g cpu1}GHz ${cpubar cpu1 7,150}
 Core2:$alignr ${cpu cpu2}%@${freq_g cpu2}GHz ${cpubar cpu2 7,150}
 Core3:$alignr ${cpu cpu3}%@${freq_g cpu3}GHz ${cpubar cpu3 7,150}
@@ -41,9 +42,9 @@ ${top_mem pid 1}${goto 50}${top_mem name 1}${goto 225}${top_mem cpu 1}$alignr${t
 ${top_mem pid 2}${goto 50}${top_mem name 2}${goto 225}${top_mem cpu 2}$alignr${top_mem mem 2}
 ${top_mem pid 3}${goto 50}${top_mem name 3}${goto 225}${top_mem cpu 3}$alignr${top_mem mem 3}
 
-Linux: ${alignr} ${fs_free /} / ${fs_size /} (${fs_free_perc /}%)
+Linux: ${alignr} ${fs_used /} / ${fs_size /} (${fs_used_perc /}%)
 ${fs_bar 8 /}
-Auxiliary: ${alignr} ${fs_free /mnt/auxiliary} / ${fs_size /mnt/auxiliary} (${fs_free_perc /mnt/auxiliary}%)
+Auxiliary: ${alignr} ${fs_used /mnt/auxiliary} / ${fs_size /mnt/auxiliary} (${fs_used_perc /mnt/auxiliary}%)
 ${fs_bar 8 /mnt/auxiliary}
 ${color white}HDD Read-> ${alignc}${color green}${diskio_read}/s ${alignr}${color #FF0009}${diskio_write}/s ${color white}<-HDD Write
 
@@ -52,7 +53,7 @@ ${color green}${downspeed em1} k/s         ${alignr}${color #FF0009}${upspeed em
 ${color green}${downspeedgraph em1 20,150} ${alignr}${color #FF0009}${upspeedgraph em1 20,150}
 ${color green}Total:${totaldown em1}       ${alignr}${color #FF0009}Total:${totalup em1}
 
-${color green}WiFi Download: ${color white}${alignc}    ESSID: ${color orange}${wireless_essid wlan0}${color white} $alignr${color #FF0009}WiFi Upload:
-${color green}${downspeed wlan0}KB/s    ${color #FF0009} ${alignr}${upspeed wlan0}KB/s
-${color green}${downspeedgraph wlan0 20,150} ${alignr}${color #FF0009}${upspeedgraph wlan0 20,150}
-${color green}Total:${totaldown wlan0}  ${alignr}${color #FF0009}Total:${totalup wlan0}
+${color green}WiFi Download: $alignr${color #FF0009}WiFi Upload:
+${color green}${downspeed wlp3s0}KB/s    ${color #FF0009} ${alignr}${upspeed wlp3s0}KB/s
+${color green}${downspeedgraph wlp3s0 20,150} ${alignr}${color #FF0009}${upspeedgraph wlp3s0 20,150}
+${color green}Total:${totaldown wlp3s0}  ${alignr}${color #FF0009}Total:${totalup wlp3s0}
