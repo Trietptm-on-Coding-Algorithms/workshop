@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 #
 {fileheader}
-
 import sys
 
 def main():
