@@ -1,4 +1,5 @@
 [alias]
+	abandon = reset --hard HEAD
 	branch-current = !"git branch | awk '/^\\*/ {print $2}' #"
 	diffstat = diff --stat -r
 	log-today = log --since="6am"
