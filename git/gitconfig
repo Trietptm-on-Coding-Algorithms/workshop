@@ -7,7 +7,8 @@
 	log-today = log --since="6am"
 	log-unpushed = log @{upstream}..HEAD
 	patch-apply = !"patch -p0 < $1 #"
-	patch-make = !"git diff --no-prefix > $1 #"
+	patch-make = diff HEAD --no-prefix
+	publish = push upstream upstream-master:master
 	snapshot = !git stash save "snapshot: $(date)" && git stash apply "stash@{0}"
 	snapshots = !git stash list --grep snapshot
 	ls = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --decorate --date=short
