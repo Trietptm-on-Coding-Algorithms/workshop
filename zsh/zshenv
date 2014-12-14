@@ -31,3 +31,7 @@ function print_good() {
 function print_status() {
 	echo "$fg_bold[blue][*]$reset_color $1"
 }
+
+function print_warning() {
+	echo "$fg_bold[yellow][*]$reset_color $1"
+}

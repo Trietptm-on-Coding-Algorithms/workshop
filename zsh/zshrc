@@ -53,13 +53,15 @@ zstyle ':completion:*:descriptions' format '%U%B%d%b%u'
 zstyle ':completion:*:warnings' format '%BSorry, no matches for: %d%b'
 
 # Aliases
+alias cd-git-root='cd $(git rev-parse --show-toplevel)'
 alias l='ls -lha'
 alias pdb='python -m pdb'
 alias pip-update="pip freeze --local | grep -v '^\-e' | cut -d = -f 1  | xargs pip install -U"
 alias prompt-clean='PROMPT="%{$fg[green]%}[%c]%# %{$reset_color%}%"'
 alias pyhttpd='python -m SimpleHTTPServer'
 alias python-clean="find . -type f -regex \".*\\.pyc$\" -exec rm -f '{}' \;"
-alias regrep='egrep -Hnr'
+alias regrep='grep -EHnr'
+alias recgrep='grep -EHnr --color=always'
 alias rsync='rsync -P'
 alias vmsuspend='vmrun list | egrep ".*\.vmx$" | while read vm; do echo "suspending $vm"; vmrun suspend $vm; done'
 alias xclipout='xclip -o -selection clipboard'
@@ -99,13 +101,34 @@ python-test() {
 		echo $fg[red]"No python unit tests found"$reset_color
 		return 0
 	fi
-	python -m unittest -v tests
-	if [ $? -eq 0 ]; then
-		echo "All tests completed successfully"
-	else
-		echo $fg[red]"Tests did not complete successfully"$reset_color
-	fi
-}
+	ALL_TESTS_PASSED=1
+	if [ -f ".travis.yml" ]; then
+		print_status "Testing based on Travis-CI configuration"
 
-# Run this for RVM
-[[ -s "$HOME/.rvm/scripts/rvm" ]] && . "$HOME/.rvm/scripts/rvm"
+		for version in $(python -m workshop.configuration .travis.yml python); do
+			if [ -f "$(which python$version 2>/dev/null)" ]; then
+				print_status "Testing with Python $version"
+				python$version -m unittest -v tests
+				if [ $? -eq 0 ]; then
+					echo "All Python $version tests completed successfully"
+				else
+					echo $fg[red]"Python $version tests did not complete successfully"$reset_color
+					ALL_TESTS_PASSED=0
+				fi
+			else
+				print_warning "Skipping Python $version due to missing binary"
+			fi
+		done
+	else
+		python -m unittest -v tests
+		if [ ! $? -eq 0 ]; then
+			ALL_TESTS_PASSED=0
+		fi
+	fi
+	if [ "$ALL_TESTS_PASSED" -eq 1 ]; then
+		print_good "All tests completed successfully"
+		return 0
+	fi
+	print_error "One or more test failed to complete successfully"
+	return 1
+}
