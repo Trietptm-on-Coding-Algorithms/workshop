@@ -5,3 +5,6 @@ run_single("set Prompt \"#{File.basename(Msf::Config.install_root)} (S:%red%S%cl
 </ruby>
 setg VERBOSE true
 setg THREADS 32
+load alias
+alias proxy_enable "set Proxies http:localhost:8079"
+alias proxy_disable "unset Proxies"
