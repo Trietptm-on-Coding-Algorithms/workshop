@@ -105,7 +105,7 @@ python-test() {
 	if [ -f ".travis.yml" ]; then
 		print_status "Testing based on Travis-CI configuration"
 
-		for version in $(python -m workshop.configuration .travis.yml python); do
+		for version in $(python -m smoke_zephyr.configuration .travis.yml python); do
 			if [ -f "$(which python$version 2>/dev/null)" ]; then
 				print_status "Testing with Python $version"
 				python$version -m unittest -v tests

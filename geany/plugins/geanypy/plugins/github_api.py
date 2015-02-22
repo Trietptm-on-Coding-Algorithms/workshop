@@ -35,13 +35,13 @@ import geany
 
 import github
 import pygit2
-import workshop
-import workshop.configuration
+import smoke_zephyr.utilities
+import smoke_zephyr.configuration
 
 REGEX_GITHUB = re.compile('^(git@|https://)github.com[:/]([\w-]+/[\w\-\.]+).git$', flags=re.IGNORECASE)
 
 def git_fetch(repo, remote_name=None):
-	if not workshop.which('git'):
+	if not smoke_zephyr.utilities.which('git'):
 		return
 	remote_name = (remote_name or '--all')
 	args = ['git', 'fetch', remote_name]
@@ -55,7 +55,7 @@ class GeanyPlugin(geany.Plugin):
 	__plugin_author__ = 'Spencer McIntyre <zeroSteiner@gmail.com>'
 
 	def __init__(self):
-		self.config = workshop.configuration.Configuration(os.environ['WORKSHOP_CONFIG'], 'geanypy_plugins.github_api')
+		self.config = smoke_zephyr.configuration.Configuration(os.environ['WORKSHOP_CONFIG'], 'geanypy_plugins.github_api')
 		self.project_menu_github = None
 		geany.signals.connect('project_open', self.init_project)
 		geany.signals.connect('project_close', self.cleanup_project)
