@@ -2,6 +2,7 @@
 # enable syntax completion
 
 import atexit
+import functools
 import os
 import sys
 import logging
@@ -72,6 +73,16 @@ def search_object(string, obj, maxdepth=5, prefix='', skip_underscores=True):
 		subobj = getattr(obj, subobj)
 		if not type(subobj).__name__ in dir(__builtins__) and maxdepth > 0:
 			search_object(string, subobj, (maxdepth - 1), subobj_id, skip_underscores)
+
+if os.getenv('PYTHONDISPHEX'):
+	_orig_disphook = sys.displayhook
+	def hex_disphook(value):
+		if isinstance(value, int):
+			print("0x{0:x}".format(value))
+		else:
+			_orig_disphook(value)
+	sys.displayhook = functools.wraps(sys.displayhook)(hex_disphook)
+	del _orig_disphook
 
 del atexit
 del _LS

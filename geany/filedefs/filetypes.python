@@ -68,7 +68,7 @@ run_cmd=python "%f"
 
 [build-menu]
 FT_02_LB=Lint
-FT_02_CM=pylint "%f"
+FT_02_CM=pylint -f text "%f"
 FT_02_WD=
 EX_00_LB=_Execute
 EX_00_CM=python "%f"

@@ -1,5 +1,7 @@
 # Geany project files
 *.geany
+
+.idea
 todo.txt
 
 docs/build

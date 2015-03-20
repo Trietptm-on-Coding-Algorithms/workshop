@@ -18,7 +18,7 @@ export SAVEHIST=$HISTSIZE
 export WORKSHOP_CONFIG="$HOME/.workshop_config.yml"
 
 # defined here so it can be used in scripts
-alias workshop-config="python -m workshop.configuration $WORKSHOP_CONFIG $1"
+alias workshop-config="python -m smoke_zephyr.configuration $WORKSHOP_CONFIG $1"
 
 function print_error() {
 	echo "$fg_bold[red][-]$reset_color $1"
