@@ -18,6 +18,6 @@ class HttpListener(IHttpListener):
 	def __init__(self, *args, **kwargs):
 		super(HttpListener, self).__init__(*args, **kwargs)
 
-	def processHttpMessage(self, tool_ame, is_request, message_info):
+	def processHttpMessage(self, tool_name, is_request, message_info):
 		if not is_request:
 			return
