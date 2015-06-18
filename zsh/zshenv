@@ -9,7 +9,7 @@
 export EDITOR="nano"
 export HISTFILE="$HOME/.zsh-history"
 export HISTSIZE=2000
-export JAVA_HOME=$(alternatives --list | awk '/^java/ {print substr($0, index($0, $3))}' | sed 's:/bin/java::g')
+export JAVA_HOME=$(alternatives --list | awk '/^java.*[0-9]$/ {print substr($0, index($0, $3))}' | head -n1 | sed 's:/bin/java::g')
 export PATH=$PATH:/usr/local/sbin
 export PS_FORMAT=pid,ppid,user,group,tty,time,cmd
 export PYTHONDONTWRITEBYTECODE=x

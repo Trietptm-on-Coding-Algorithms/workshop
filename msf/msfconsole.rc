@@ -8,3 +8,4 @@ setg THREADS 32
 load alias
 alias proxy_enable "set Proxies http:localhost:8079"
 alias proxy_disable "unset Proxies"
+alias routes "route print"

@@ -35,15 +35,6 @@ if [ ! -z "$STAGED_FILES_PYTHON" ]; then
 		exit 1
 	fi
 
-	if [ -f ".pylintrc" ]; then
-		print_status "Running style checks with pylint..."
-		xargs pylint --rcfile .pylintrc --reports no <<< $STAGED_FILES_PYTHON
-		if [ "$?" -ne "0" ]; then
-			print_error "Style checks failed"
-			exit 1
-		fi
-	fi
-
 	PEP_LINES=$(xargs autopep8 --ignore=E101,E124,E128,E241,E26,E27,E301,E302,E309,E501 --diff <<< $STAGED_FILES_PYTHON)
 	if [ ! -z "$PEP_LINES" ]; then
 		print_error "Changes are not pep8 compliant"
@@ -54,6 +45,16 @@ if [ ! -z "$STAGED_FILES_PYTHON" ]; then
 		print_status "Review and apply with \"git autofix\", or ignore with \"git commit -n\""
 		git config alias.autofix "!workshop-git-autofix \"$REPO_DIRECTORY\" \"$PATCH_FILE\"; git config --unset alias.autofix"
 		exit 1
+	fi
+
+	if [ -f ".pylintrc" ]; then
+		print_status "Running style checks with pylint..."
+		export KIVY_DOC_INCLUDE=x
+		xargs pylint --rcfile .pylintrc --reports no <<< $STAGED_FILES_PYTHON
+		if [ "$?" -ne "0" ]; then
+			print_error "Style checks failed"
+			exit 1
+		fi
 	fi
 
 	if [ -f "tests.py" ] || [ -d "tests" ]; then
