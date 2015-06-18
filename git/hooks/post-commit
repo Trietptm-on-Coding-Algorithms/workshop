@@ -9,12 +9,15 @@ cd $PROJECT_FOLDER
 
 PROJECT_DOCS_FOLDER="$(eval echo $(workshop-config projects.docs_folder))"
 if [ -f "docs/source/conf.py" ]; then
+	print_status "Building the latest documentation with Sphinx"
+	rm -rf docs/html
+	sphinx-build -b html docs/source docs/html &> /dev/null
+	if [ $? -ne 0 ]; then
+		print_error "Sphinx documentation build did not complete successfully"
+		exit
+	fi
 	if [ ! -z "$PROJECT_DOCS_FOLDER" ]; then
-		print_status "Building the latest documentation with Sphinx"
-		sphinx-build -b html docs/source "$PROJECT_DOCS_FOLDER/$PROJECT_NAME" &> /dev/null
-		if [ $? -ne 0 ]; then
-			print_error "Sphinx documentation build did not complete successfully"
-			exit
-		fi
+		rm -rf "$PROJECT_DOCS_FOLDER/$PROJECT_NAME"
+		cp -r docs/html "$PROJECT_DOCS_FOLDER/$PROJECT_NAME"
 	fi
 fi
