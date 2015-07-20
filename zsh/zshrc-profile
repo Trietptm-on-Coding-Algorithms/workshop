@@ -4,7 +4,7 @@
 autoload -Uz vcs_info
 zstyle ':vcs_info:*' enable hg git
 zstyle ':vcs_info:*' check-for-changes true
-zstyle ':vcs_info:(hg*|git*)' formats "[%s %u:%c %r:%b] "
+zstyle ':vcs_info:(hg*|git*)' formats "[%s %u:%c %r:%b]"
 
 precmd() { vcs_info }
 setopt prompt_subst
@@ -13,3 +13,5 @@ PROMPT="$VCSPROMPT$PROMPT"
 
 [[ -d $HOME/.bin ]] && PATH=$PATH:$HOME/.bin
 [[ -f $HOME/.zshrc-local ]] && source $HOME/.zshrc-local
+
+export PATH="/usr/local/p/versions/python:$PATH"

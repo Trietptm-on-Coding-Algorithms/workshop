@@ -1,0 +1,170 @@
+#compdef alembic
+# ------------------------------------------------------------------------------
+# Copyright (c) 2015 Spencer McIntyre
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#   * Redistributions of source code must retain the above copyright
+#     notice, this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright
+#     notice, this list of conditions and the following disclaimer in the
+#     documentation and/or other materials provided with the distribution.
+#   * Neither the name of the project nor the
+#     names of its contributors may be used to endorse or promote products
+#     derived from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL ZSH-USERS BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# ------------------------------------------------------------------------------
+# Description
+# -----------
+#
+#  Completion script for alembic.
+#
+# ------------------------------------------------------------------------------
+# Authors
+# -------
+#
+#  * Spencer McIntyre
+#
+# ------------------------------------------------------------------------------
+
+_subparser_action_cmd_branches() {
+  _arguments \
+      {-h,--help}"[show help text]" \
+      {-v,--verbose}"[use more verbose output]"
+  }
+
+_subparser_action_cmd_current() {
+  _arguments \
+      {-h,--help}"[show help text]" \
+      {-v,--verbose}"[use more verbose output]"
+  }
+
+_subparser_action_cmd_downgrade() {
+  _arguments \
+      {-h,--help}"[show help text]" \
+      "--sql[don't emit sql to database]" \
+      "--tag[arbitrary 'tag' name]:tag" \
+      "1::revision"
+  }
+
+_subparser_action_cmd_heads() {
+  _arguments \
+      {-h,--help}"[show help text]" \
+      {-v,--verbose}"[use more verbose output]" \
+      "--resolve-dependencies[treat dependency versions as down revisions]"
+  }
+
+_subparser_action_cmd_history() {
+  _arguments \
+      {-h,--help}"[show help text]" \
+      {-v,--verbose}"[use more verbose output]" \
+      {-r,--rev-range}"[specify a revision range]:rev_range"
+  }
+
+_subparser_action_cmd_init() {
+  _arguments \
+      {-h,--help}"[show help text]" \
+      {-t,--template}"[setup template for use with 'init']:template" \
+      "1::directory:_files -d"
+  }
+
+_subparser_action_cmd_list_templates() {
+  _arguments \
+      {-h,--help}"[show help text]"
+  }
+
+_subparser_action_cmd_merge() {
+  _arguments \
+      {-h,--help}"[show help text]" \
+      {-m,--message}"[message string to use with 'revision']:message" \
+      "--branch-label[specify a branch label to apply to the new revision]:branch_label" \
+      "--rev-id[specify a hardcoded revision id instead of generating one]:rev_id" \
+      "*::revisions"
+  }
+
+_subparser_action_cmd_revision() {
+  _arguments \
+      {-h,--help}"[show help text]" \
+      {-m,--message}"[message string to use with 'revision']:message" \
+      "--autogenerate[populate revision script with candidate migration options]" \
+      "--sql[don't emit sql to database]" \
+      "--head[specify head revision]:head" \
+      "--splice[allow a non-head revision as the 'head' to splice onto]" \
+      "--branch-label[specify a branch label to apply to the new revision]:branch_label" \
+      "--version-path[specify specific path from config for version file]:version_path" \
+      "--rev-id[specify a hardcoded revision id instead of generating one]:rev_id"
+  }
+
+_subparser_action_cmd_show() {
+  _arguments \
+      {-h,--help}"[show help text]" \
+      "1::revision"
+  }
+
+_subparser_action_cmd_stamp() {
+  _arguments \
+      {-h,--help}"[show help text]" \
+      "--sql[don't emit sql to database]" \
+      "--tag[arbitrary 'tag' name]:tag" \
+      "1::revision"
+  }
+
+_subparser_action_cmd_upgrade() {
+  _arguments \
+      {-h,--help}"[show help text]" \
+      "--sql[don't emit sql to database]" \
+      "--tag[arbitrary 'tag' name]:tag" \
+      "1::revision"
+  }
+
+_subparser_action() {
+  local -a _subparser_cmds
+  _subparser_cmds=(
+        "branches:show current branch points"
+        "current:display the current revision for a database"
+        "downgrade:revert to a previous version"
+        "heads:show current available heads in the script directory"
+        "history:list changeset scripts in chronological order"
+        "init:initialize a new scripts directory"
+        "list_templates:list available templates"
+        "merge:merge two revisions together"
+        "revision:create a new revision file"
+        "show:show the revision(s) denoted by the given symbol"
+        "stamp:'stamp' the revision table with the given revision"
+        "upgrade:upgrade to a later version"
+      )
+
+  if (( CURRENT == 1 )); then
+    _describe "commands" _subparser_cmds
+  else
+    local curcontext="$curcontext"
+    cmd="${${_subparser_cmds[(r)$words[1]:*]%%:*}}"
+    if (( $#cmd )); then
+      if (( $+functions[_subparser_action_cmd_$cmd] )); then
+        _subparser_action_cmd_$cmd CURRENT
+      else
+        _files
+      fi
+    else
+      _message "unknown command: $words[1]"
+    fi
+  fi
+}
+_arguments \
+  {-h,--help}"[show help text]" \
+  {-c,--config}"[alternate config file]:config:_files -g \*.ini" \
+  {-n,--name}"[name of section in .ini file to use for alembic config]:name" \
+  "-x[additional arguments to be consumed by custom env.py]:X" \
+  "--raiseerr[raise a full stack trace on error]" \
+  "*::action:_subparser_action"
