@@ -1,7 +1,7 @@
 [alias]
 	abandon = reset --hard HEAD
-	branch-current = !"git branch | awk '/^\\*/ {print $2}' #"
-	checkout-pr = "!f() { git fetch -fu ${2:-origin} refs/pull/$1/head:pr/$1 && git checkout pr/$1; }; f"
+	branch-current = !git branch | awk '/^\\*/ {print $2}'
+	checkout-pr = !"f() { git fetch -fu ${2:-origin} refs/pull/$1/head:pr/$1 && git checkout pr/$1; }; f"
 	diffstat = diff --stat -r
 	log-merges = log --merges
 	log-mine = !git log --author=\"$(git config user.name)\"
