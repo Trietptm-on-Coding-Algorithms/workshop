@@ -8,12 +8,13 @@ autoload -U compinit
 compinit
 autoload -U colors
 colors
+autoload -U zmv
 
 # Set prompts
 if [ "$(whoami)" = 'root' ]; then
-	DEFAULTPROMPT="%{$fg_bold[red]%}[%* %n %c]%# %{$reset_color%}%" # root prompt
+	DEFAULTPROMPT="%{$fg_bold[red]%}[%* %c] %{$reset_color%}%" # root prompt
 else
-	DEFAULTPROMPT="%{$fg[green]%}[%* %n %c]%# %{$reset_color%}%" # default prompt
+	DEFAULTPROMPT="%{$fg[green]%}[%* %c] %{$reset_color%}%" # default prompt
 fi
 PROMPT=$DEFAULTPROMPT
 
