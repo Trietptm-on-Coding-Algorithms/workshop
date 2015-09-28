@@ -8,3 +8,7 @@ The files contained within are for customizing the following applications:
 - Git
 - Python
 - Zsh
+
+## Hack Typeface
+Some of the configuration files may require that the Hack Typeface be installed.
+It can be found in this [git repository](https://github.com/chrissimpkins/Hack).
