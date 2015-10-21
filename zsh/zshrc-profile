@@ -1,5 +1,8 @@
 # $HOME/.zshrc
-# Lines configured by zsh-newuser-install
+##################################################
+# zsh minimal profile
+# https://github.com/zeroSteiner/workshop
+##################################################
 
 autoload -Uz vcs_info
 zstyle ':vcs_info:*' enable hg git
@@ -13,5 +16,3 @@ PROMPT="$VCSPROMPT$PROMPT"
 
 [[ -d $HOME/.bin ]] && PATH=$PATH:$HOME/.bin
 [[ -f $HOME/.zshrc-local ]] && source $HOME/.zshrc-local
-
-export PATH="/usr/local/p/versions/python:$PATH"
