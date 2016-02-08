@@ -12,13 +12,14 @@ autoload -U zmv
 
 # Set prompts
 if [ "$(whoami)" = 'root' ]; then
-	DEFAULTPROMPT="%{$fg_bold[red]%}[%* %c] %{$reset_color%}%" # root prompt
+	DEFAULTPROMPT="%{$bg[red]$fg[white]%}%* %c %{$reset_color%}% " # root prompt
 else
-	DEFAULTPROMPT="%{$fg[green]%}[%* %c] %{$reset_color%}%" # default prompt
+	DEFAULTPROMPT="%{$bg[green]$fg[white]%}%* %c %{$reset_color%}% " # default prompt
 fi
 PROMPT=$DEFAULTPROMPT
 
 bindkey ' ' magic-space  # also do history expansion on space
+bindkey -e
 
 _src_etc_profile_d()
 {
@@ -65,6 +66,7 @@ alias regrep='grep -EHnr'
 alias recgrep='grep -EHnr --color=always'
 alias rsync='rsync -P'
 alias vmsuspend='vmrun list | egrep ".*\.vmx$" | while read vm; do echo "suspending $vm"; vmrun suspend $vm; done'
+alias xclipin='xclip -i -selection clipboard'
 alias xclipout='xclip -o -selection clipboard'
 
 # Functions

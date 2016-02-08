@@ -7,6 +7,7 @@
 # load gabrielelana/awesome-terminal-fonts
 source $HOME/.fonts/fontawesome-regular.sh
 source $HOME/.fonts/octicons-regular.sh
+CODEPOINT_OF_ARROW="e0b0"
 
 function git_branch_char {
   GIT_BRANCH_NAME=$(git branch | awk '/^\*/ {print $2}')
@@ -33,13 +34,17 @@ function git_prompt_char {
   fi
 }
 
+function transit_char {
+  echo "%{$bg[green]$fg[black]%}"
+}
+
 autoload -Uz vcs_info
 zstyle ':vcs_info:*' enable git hg
 zstyle ':vcs_info:*' check-for-changes true
-zstyle -e ':vcs_info:git*' formats 'reply=("%{$bg[black]%}%{$fg[white]%} $(git_prompt_char) %u:%c %{$fg_bold[white]%}%r%{$fg_no_bold[white]%}:$(git_branch_char)%{$reset_color%}")'
+zstyle -e ':vcs_info:git*' formats 'reply=("%{$bg[black]%}%{$fg[white]%} $(git_prompt_char) %u:%c %{$fg_bold[white]%}%r%{$fg_no_bold[white]%}:$(git_branch_char)%{$reset_color%}$(transit_char)")'
 zstyle ':vcs_info:git*' stagedstr '+'
 zstyle ':vcs_info:git*' unstagedstr '!'
-zstyle ':vcs_info:hg*' formats '[h %r:%b]'
+zstyle -e ':vcs_info:hg*' formats 'reply=("%{$bg[black]%}%{$fg[white]%}[h %{$fg_bold[white]%}%r%{$fg_no_bold[white]%}:%b]%{$reset_color%}$(transit_char)")'
 
 precmd() {
   vcs_info
@@ -47,7 +52,7 @@ precmd() {
 
 setopt prompt_subst
 VCSPROMPT='${vcs_info_msg_0_}'
-PROMPT="$VCSPROMPT$PROMPT"
+PROMPT="$VCSPROMPT$PROMPT%{$fg[green]%}%{$reset_color%}"
 
 [[ -d $HOME/.bin ]] && PATH=$PATH:$HOME/.bin
 [[ -f $HOME/.zshrc-local ]] && source $HOME/.zshrc-local
