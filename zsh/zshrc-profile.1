@@ -9,6 +9,10 @@ source $HOME/.fonts/fontawesome-regular.sh
 source $HOME/.fonts/octicons-regular.sh
 CODEPOINT_OF_ARROW="e0b0"
 
+function arrow_right {
+  echo "\u${CODEPOINT_OF_ARROW}"
+}
+
 function git_branch_char {
   GIT_BRANCH_NAME=$(git branch | awk '/^\*/ {print $2}')
   if [[ "$GIT_BRANCH_NAME" == "master" ]]; then
@@ -35,7 +39,7 @@ function git_prompt_char {
 }
 
 function transit_char {
-  echo "%{$bg[green]$fg[black]%}"
+  echo "%{$bg[green]$fg[black]%}$(arrow_right)"
 }
 
 autoload -Uz vcs_info
@@ -52,7 +56,7 @@ precmd() {
 
 setopt prompt_subst
 VCSPROMPT='${vcs_info_msg_0_}'
-PROMPT="$VCSPROMPT$PROMPT%{$fg[green]%}%{$reset_color%}"
+PROMPT="$VCSPROMPT$PROMPT%{$fg[green]%}$(arrow_right)%{$reset_color%}"
 
 [[ -d $HOME/.bin ]] && PATH=$PATH:$HOME/.bin
 [[ -f $HOME/.zshrc-local ]] && source $HOME/.zshrc-local
