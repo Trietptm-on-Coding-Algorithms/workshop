@@ -32,6 +32,8 @@ Highest CPU $alignr CPU%   MEM%
 ${top pid 1}${goto 50}${top name 1}${goto 245}${top cpu 1}$alignr${top mem 1}
 ${top pid 2}${goto 50}${top name 2}${goto 245}${top cpu 2}$alignr${top mem 2}
 ${top pid 3}${goto 50}${top name 3}${goto 245}${top cpu 3}$alignr${top mem 3}
+${top pid 4}${goto 50}${top name 4}${goto 245}${top cpu 4}$alignr${top mem 4}
+${top pid 5}${goto 50}${top name 5}${goto 245}${top cpu 5}$alignr${top mem 5}
 
 RAM ${alignr}$mem / $memmax (${color orange}$memperc${color white}%)
 ${membar 8}
@@ -41,6 +43,8 @@ Highest MEM $alignr CPU%   MEM%
 ${top_mem pid 1}${goto 50}${top_mem name 1}${goto 245}${top_mem cpu 1}$alignr${top_mem mem 1}
 ${top_mem pid 2}${goto 50}${top_mem name 2}${goto 245}${top_mem cpu 2}$alignr${top_mem mem 2}
 ${top_mem pid 3}${goto 50}${top_mem name 3}${goto 245}${top_mem cpu 3}$alignr${top_mem mem 3}
+${top_mem pid 4}${goto 50}${top_mem name 4}${goto 245}${top_mem cpu 4}$alignr${top_mem mem 4}
+${top_mem pid 5}${goto 50}${top_mem name 5}${goto 245}${top_mem cpu 5}$alignr${top_mem mem 5}
 
 Linux: ${alignr} ${fs_used /} / ${fs_size /} (${fs_used_perc /}%)
 ${fs_bar 8 /}

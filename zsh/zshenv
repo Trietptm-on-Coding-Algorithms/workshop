@@ -6,16 +6,19 @@
 # that the shell is attached to a tty.
 #
 
-export EDITOR="nano"
+export EDITOR="vim"
 export HISTFILE="$HOME/.zsh-history"
 export HISTSIZE=2000
-export JAVA_HOME=$(alternatives --list | awk '/^java.*[0-9]$/ {print substr($0, index($0, $3))}' | head -n1 | sed 's:/bin/java::g')
 export PATH=$PATH:/usr/local/sbin
 export PS_FORMAT=pid,ppid,user,group,tty,time,cmd
 export PYTHONDONTWRITEBYTECODE=x
 export PYTHONSTARTUP=$HOME/.pystartup
 export SAVEHIST=$HISTSIZE
 export WORKSHOP_CONFIG="$HOME/.workshop_config.yml"
+
+if [ "$(command -v alternatives)" ]; then
+	export JAVA_HOME=$(alternatives --list | awk '/^java.*[0-9]$/ {print substr($0, index($0, $3))}' | head -n1 | sed 's:/bin/java::g')
+fi
 
 # defined here so it can be used in scripts
 alias workshop-config="python -m smoke_zephyr.configuration $WORKSHOP_CONFIG $1"
