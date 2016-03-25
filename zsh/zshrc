@@ -74,7 +74,31 @@ github-clone() {
 	git clone git@github.com:$1.git
 }
 
-hashfile() {
+decrypt-file() {
+	if [ ! $(command -v openssl) ]; then
+		print_error "This requires openssl to be installed"
+		return 1
+	fi
+	if [ "$#" -ne 2 ]; then
+		print_status "Usage: encrypt-file [in file] [out file]"
+		return 0
+	fi
+	openssl aes-256-cbc -d -salt -in "$1" -out "$2"
+}
+
+encrypt-file() {
+	if [ ! $(command -v openssl) ]; then
+		print_error "This requires openssl to be installed"
+		return 1
+	fi
+	if [ "$#" -ne 2 ]; then
+		print_status "Usage: encrypt-file [in file] [out file]"
+		return 0
+	fi
+	openssl aes-256-cbc -salt -in "$1" -out "$2"
+}
+
+hash-file() {
 	for file in "$@"; do
 		if [ -f "$file" ]; then
 			echo "hashing: $file";
