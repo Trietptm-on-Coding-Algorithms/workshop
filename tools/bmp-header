@@ -1,0 +1,134 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#
+#  bmp_header.py
+#
+#  Copyright 2015 Spencer McIntyre <zeroSteiner@gmail.com>
+#
+#  Redistribution and use in source and binary forms, with or without
+#  modification, are permitted provided that the following conditions are
+#  met:
+#
+#  * Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+#  * Redistributions in binary form must reproduce the above
+#    copyright notice, this list of conditions and the following disclaimer
+#    in the documentation and/or other materials provided with the
+#    distribution.
+#  * Neither the name of the  nor the names of its
+#    contributors may be used to endorse or promote products derived from
+#    this software without specific prior written permission.
+#
+#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+#  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+#  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+#  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+#  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+#  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+#  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+#  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+#  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+#  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+#  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+
+import argparse
+import os
+import struct
+import sys
+
+import capstone
+
+# https://gist.github.com/zeroSteiner/7920683
+import jarvis
+
+__version__ = '0.1'
+
+"""
+Offset (hex) Offset (dec) Size (bytes)   Windows BITMAPINFOHEADER[2]
+0E           14           4             the size of this header (40 bytes)
+12           18           4             the bitmap width in pixels (signed integer)
+16           22           4             the bitmap height in pixels (signed integer)
+1A           26           2             the number of color planes (must be 1)
+1C           28           2             the number of bits per pixel, which is the color depth of the image. Typical values are 1, 4, 8, 16, 24 and 32.
+1E           30           4             the compression method being used. See the next table for a list of possible values
+22           34           4             the image size. This is the size of the raw bitmap data; a dummy 0 can be given for BI_RGB bitmaps.
+26           38           4             the horizontal resolution of the image. (pixel per meter, signed integer)
+2A           42           4             the vertical resolution of the image. (pixel per meter, signed integer)
+2E           46           4             the number of colors in the color palette, or 0 to default to 2n
+32           50           4             the number of important colors used, or 0 when every color is important; generally ignored
+"""
+
+DIB_HEADERS_BY_SIZE = {
+	12:  'BITMAPCOREHEADER',
+	40:  'BITMAPINFOHEADER',
+	52:  'BITMAPV2INFOHEADER',
+	56:  'BITMAPV3INFOHEADER',
+	64:  'OS22XBITMAPHEADER',
+	108: 'BITMAPV4HEADER',
+	124: 'BITMAPV5HEADER'
+}
+
+def show_bmp_file_header(jar, bmp_file, polyglot=False):
+	header_data = bmp_file.read(54)
+
+	stat = os.stat(bmp_file.name)
+	parsed_header = struct.unpack('<hIhhI', header_data[:14])
+	size = parsed_header[1]
+	jar.print_status("{0} bmp header:".format(bmp_file.name))
+	jar.print_status("  header type: 0x{0:04x}".format(parsed_header[0]))
+	if stat.st_size == size:
+		jar.print_status("  size:        0x{0:08x}".format(parsed_header[1]))
+	else:
+		jar.print_error("  size:        0x{0:08x} (incorrect, should be: 0x{1:08x})".format(parsed_header[1], stat.st_size))
+	jar.print_status("  reserved0:   0x{0:04x}".format(parsed_header[2]))
+	jar.print_status("  reserved1:   0x{0:04x}".format(parsed_header[3]))
+	jar.print_status("  data offset: 0x{0:08x}".format(parsed_header[4]))
+	parsed_header = struct.unpack('<IIIhhIIIIII', header_data[14:])
+
+	jar.print_status("dib header: ({0})".format(DIB_HEADERS_BY_SIZE.get(parsed_header[0], 'UNKNOWN')))
+	jar.print_status("  header size:      0x{0:04x}".format(parsed_header[0]))
+	jar.print_status("  dimensions:       {0} x {1}".format(parsed_header[1], parsed_header[2]))
+	jar.print_status("  color planes:     {0}".format(parsed_header[3]))
+	jar.print_status("  bits per pixel:   {0}".format(parsed_header[4]))
+	jar.print_status("  compression type: {0}".format(parsed_header[5]))
+
+	if polyglot:
+		jmp = 0
+		jmp_opcode = struct.pack('<IBB', size, 0, 0)
+		while len(jmp_opcode) and not jmp_opcode[0] in ('\xe9', '\xeb'):
+			jmp_opcode = jmp_opcode[1:]
+			jmp += 1
+		if not jmp_opcode:
+			jar.print_error('bmp does not appear to be a polyglot')
+			return
+		if jmp_opcode[0] == '\xe9':
+			jmp += struct.unpack('<I', jmp_opcode[1:5])[0] + 5
+		elif jmp_opcode[0] == '\xeb':
+			jmp += struct.unpack('<B', jmp_opcode[1])[0] + 2
+		else:
+			raise RuntimeError("unknown start byte: 0x{0:02x}".format(ord(jmp[0])))
+		stub_offset = jmp + 2
+		bmp_file.seek(stub_offset)
+		stub = bmp_file.read(52)
+		cs = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_32)
+		jar.print_status("payload stub:")
+		for (address, size, mnemonic, op_str) in cs.disasm_lite(stub, stub_offset):
+			jar.print_line("  0x{0:04x} {1} {2}".format(address, mnemonic, op_str))
+
+def main():
+	jar = jarvis.Jarvis()
+	parser = jar.build_argparser('BMP Header Dump', version=__version__)
+	parser.add_argument('--debug', dest='debug', action='store_true', default=False, help='start a debugging session')
+	parser.add_argument('--polyglot', dest='polyglot', action='store_true', default=False, help='treat the image as a polyglot')
+	parser.add_argument('bmp_files', nargs='+', type=argparse.FileType('rb'), help='the file to read')
+	args = parser.parse_args()
+
+	for bmp_file in args.bmp_files:
+		show_bmp_file_header(jar, bmp_file, args.polyglot)
+		jar.print_line('')
+
+	return 0
+
+if __name__ == '__main__':
+	sys.exit(main())

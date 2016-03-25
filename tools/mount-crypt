@@ -1,0 +1,98 @@
+#!/bin/sh
+set -e
+set -o pipefail
+
+E_NOTROOT=87
+
+function show_help {
+  echo "Usage: $(basename $0) [mount/unmount] file mount_point"
+  echo ""
+  echo "Mount A LUKS Encrypted Volume"
+  echo ""
+  echo "optional arguments"
+  echo "  -h, --help            show this help message and exit"
+  echo "  -n, --name            the luks name to use for the device"
+  return 0;
+}
+
+pargs=0
+arg_luks_name="file"
+while :; do
+  case $1 in
+    -h|-\?|--help)
+      show_help
+      exit
+      ;;
+    -n|--name)
+      arg_luks_name="$1"
+      ;;
+    --)
+      shift
+      break
+      ;;
+    -?*)
+      printf "Unknown option: %s\n" "$1" >&2
+      exit $E_USAGE
+      ;;
+    *)
+      if [ -z $1 ]; then
+        if [ $pargs -eq 3 ]; then
+          break
+        else
+          case $pargs in
+            0)
+              echo "Please specify mount or unmount"
+              ;;
+            1)
+              echo "Please specify a file to mount"
+              ;;
+            2)
+              echo "Please specify a mount point"
+              ;;
+          esac
+          exit
+        fi
+      fi
+      case $pargs in
+        0)
+          arg_operation="$1"
+          ;;
+        1)
+          arg_file="$1"
+          ;;
+        2)
+          arg_mnt_pt="$1"
+          ;;
+      esac
+      pargs=$(expr $pargs + 1)
+      ;;
+  esac
+  shift
+done
+
+if [ "$(id -u)" != "0" ]; then
+  echo "This must be run as root"
+  exit $E_NOTROOT
+fi
+
+loop_device=$(losetup -f)
+
+if [ "$arg_operation" == "mount" ]; then
+  echo "Setting up loop device $arg_file to $loop_device"
+  losetup $loop_device $arg_file
+  cryptsetup luksOpen $loop_device $arg_luks_name
+  echo "Mounting to $arg_mnt_pt"
+  mount /dev/mapper/$arg_luks_name $arg_mnt_pt
+
+elif [ "$arg_operation" == "unmount" ]; then
+  echo "Unmounting $arg_mnt_pt"
+  umount $arg_mnt_pt
+  cryptsetup luksClose $arg_luks_name
+  echo "Removing loop device $loop_device"
+  losetup -d $loop_device
+
+else
+  echo "Please specify either mount or unmount"
+  exit 1
+
+fi
