@@ -1,0 +1,189 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+#  coffin
+#
+#  Copyright 2016 Spencer McIntyre <zeroSteiner@gmail.com>
+#
+#  Redistribution and use in source and binary forms, with or without
+#  modification, are permitted provided that the following conditions are
+#  met:
+#
+#  * Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+#  * Redistributions in binary form must reproduce the above
+#    copyright notice, this list of conditions and the following disclaimer
+#    in the documentation and/or other materials provided with the
+#    distribution.
+#  * Neither the name of the  nor the names of its
+#    contributors may be used to endorse or promote products derived from
+#    this software without specific prior written permission.
+#
+#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+#  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+#  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+#  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+#  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+#  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+#  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+#  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+#  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+#  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+#  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+
+from __future__ import unicode_literals
+
+import argparse
+import collections
+import os
+import subprocess
+import sys
+import tarfile
+import tempfile
+
+import jinja2
+
+__version__ = '1.0'
+
+EPILOG = """\
+This utility creates a portable self-decrypting self-extracting archive. Once
+the archive has been created, the original files can be retrieved by executing
+it on any system with openssl and tar installed. This utility used to create
+the archive DOES NOT need to be present in order for the archive to be opened.
+"""
+
+SCRIPT_TEMPLATE = """\
+#!/bin/sh
+# generated with coffin v{{ version }}
+# https://github.com/zeroSteiner/workshop/blob/master/tools/coffin
+# compression: {{ compression.name }} encryption: {{ encryption }}
+{% for bin in required_bins %}
+if [ ! $(command -v {{ bin }}) ]; then
+  echo "[-] this self decrypting archive requires the {{ bin }} binary to be installed"
+  exit 1
+fi
+
+{% endfor %}
+read -r -d '' encrypted <<- __EOM__
+{% for line in encrypted_lines %}
+{{ line }}
+{% endfor %}
+__EOM__
+
+echo "$encrypted" | \\
+openssl {{ encryption }} -d -a -in /dev/stdin -out /dev/stdout | \\
+{% if compression.name == 'none' %}
+tar --extract --file=/dev/stdin
+{% else %}
+tar --extract {{ compression.tar_flag }} --file=/dev/stdin
+{% endif %}
+
+if [ "$?" = "0" ]; then
+  echo "[+] successfully extracted the archive"
+else
+  echo "[-] failed to extract the archive"
+  exit 1
+fi
+
+exit 0
+"""
+
+CompressionScheme = collections.namedtuple('CompressionScheme', ('name', 'pytar_mode', 'tar_flag'))
+COMPRESSION_SCHEMES = {
+	'bzip2': CompressionScheme('bzip2', 'bz2', '--bzip2'),
+	'gzip': CompressionScheme('gzip', 'gz', '--gzip'),
+	'lzma': CompressionScheme('lzma', 'xz', '--xz'),
+	'none': CompressionScheme('none', '', '')
+}
+
+def main():
+	parser = argparse.ArgumentParser(description='coffin', conflict_handler='resolve')
+	parser.add_argument(
+		'-c',
+		'--compression',
+		choices=COMPRESSION_SCHEMES.keys(),
+		default='gzip',
+		dest='compression',
+		help='the type of compression to use (default: gzip)'
+	)
+	parser.add_argument('-o', '--out', dest='output_path', help='the archive file to write')
+	parser.add_argument('input_path', help='the file or directory to store')
+	parser.epilog = EPILOG
+	arguments = parser.parse_args()
+
+	input_path = arguments.input_path
+	output_path = arguments.output_path
+
+	compression = COMPRESSION_SCHEMES[arguments.compression]
+	encryption = 'aes-256-cbc'
+
+	if output_path is None:
+		output_path = os.path.basename(input_path) + '.sh'
+
+	if not os.access(input_path, os.R_OK):
+		print('[-] can not read the specified input path')
+		return os.EX_NOPERM
+
+	(tmp_fd, tmp_archive_path) = tempfile.mkstemp()
+	os.close(tmp_fd)
+	(tmp_fd, tmp_encrypted_path) = tempfile.mkstemp()
+	os.close(tmp_fd)
+
+	created = False
+	try:
+		with tarfile.open(tmp_archive_path, mode='w:' + compression.pytar_mode) as tar_file_h:
+			tar_file_h.add(
+				input_path,
+				arcname=os.path.basename(input_path),
+				recursive=True
+			)
+
+		proc_h = subprocess.Popen(
+			['openssl', encryption, '-a', '-in', tmp_archive_path, '-out', tmp_encrypted_path],
+			stdout=subprocess.PIPE,
+			close_fds=True
+		)
+		assert proc_h.wait() == 0
+		with open(tmp_encrypted_path, 'rb') as file_h:
+			encrypted_lines = file_h.read()
+		assert encrypted_lines
+	except KeyboardInterrupt:
+		pass
+	else:
+		created = True
+	finally:
+		os.remove(tmp_archive_path)
+		os.remove(tmp_encrypted_path)
+
+	if not created:
+		print('[-] archive creation failed')
+		return os.EX_IOERR
+
+	encrypted_lines = encrypted_lines.decode('utf-8')
+	encrypted_lines = encrypted_lines.split('\n')
+	if not encrypted_lines[-1]:
+		encrypted_lines.pop()
+
+	env = jinja2.Environment(
+		lstrip_blocks=True,
+		trim_blocks=True
+	)
+
+	template = env.from_string(SCRIPT_TEMPLATE)
+	script = template.render(
+		compression=compression,
+		encrypted_lines=encrypted_lines,
+		encryption=encryption,
+		required_bins=('openssl', 'tar'),
+		version=__version__
+	)
+
+	with open(output_path, 'w') as file_h:
+		file_h.write(script)
+	os.chmod(output_path, 0o755)
+	return os.EX_OK
+
+if __name__ == '__main__':
+	sys.exit(main())
+
