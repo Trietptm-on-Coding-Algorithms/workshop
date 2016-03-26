@@ -36,6 +36,7 @@ from __future__ import unicode_literals
 
 import argparse
 import collections
+import getpass
 import os
 import subprocess
 import sys
@@ -60,14 +61,14 @@ SCRIPT_TEMPLATE = """\
 # compression: {{ compression.name }} encryption: {{ encryption }}
 {% for bin in required_bins %}
 if [ ! $(command -v {{ bin }}) ]; then
-  echo "[-] this self decrypting archive requires the {{ bin }} binary to be installed"
+  echo "[-] this self extracting archive requires the {{ bin }} binary to be installed"
   exit 1
 fi
 
 {% endfor %}
 read -r -d '' encrypted <<- __EOM__
 {% for line in encrypted_lines %}
-{{ line }}
+  {{ line }}
 {% endfor %}
 __EOM__
 
@@ -97,6 +98,17 @@ COMPRESSION_SCHEMES = {
 	'none': CompressionScheme('none', '', '')
 }
 
+def prompt_for_password(encryption, tries=3):
+	password0, password1 = (0, 1)
+	while tries and password0 != password1:
+		tries -= 1
+		password0 = getpass.getpass("[?] enter {0} encryption password: ".format(encryption))
+		password1 = getpass.getpass("[?] verify {0} encryption password: ".format(encryption))
+		if password0 == password1:
+			return password0
+		print('[-] passwords do not match')
+	return None
+
 def main():
 	parser = argparse.ArgumentParser(description='coffin', conflict_handler='resolve')
 	parser.add_argument(
@@ -125,6 +137,10 @@ def main():
 		print('[-] can not read the specified input path')
 		return os.EX_NOPERM
 
+	password = prompt_for_password(encryption)
+	if password is None:
+		return os.EX_USAGE
+
 	(tmp_fd, tmp_archive_path) = tempfile.mkstemp()
 	os.close(tmp_fd)
 	(tmp_fd, tmp_encrypted_path) = tempfile.mkstemp()
@@ -140,10 +156,14 @@ def main():
 			)
 
 		proc_h = subprocess.Popen(
-			['openssl', encryption, '-a', '-in', tmp_archive_path, '-out', tmp_encrypted_path],
+			['openssl', encryption, '-a', '-in', tmp_archive_path, '-out', tmp_encrypted_path, '-pass', 'stdin'],
+			stdin=subprocess.PIPE,
 			stdout=subprocess.PIPE,
 			close_fds=True
 		)
+		proc_h.stdin.write(password.encode('utf-8'))
+		proc_h.stdin.flush()
+		proc_h.stdin.close()
 		assert proc_h.wait() == 0
 		with open(tmp_encrypted_path, 'rb') as file_h:
 			encrypted_lines = file_h.read()
