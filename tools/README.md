@@ -12,3 +12,6 @@ and self-extracting archive utilizing openssl and tar.
 ## mount-crypt
 This shell script will create and mount an LUKS encrypted volume.
 
+## zpycompletion
+This Python script will take another Python script which utilizes the argparse
+module for argument parsing and generate a zsh compatible autocompletion file.
