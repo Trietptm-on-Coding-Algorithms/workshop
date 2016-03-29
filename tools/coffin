@@ -55,7 +55,7 @@ the archive DOES NOT need to be present in order for the archive to be opened.
 """
 
 SCRIPT_TEMPLATE = """\
-#!/bin/sh
+#!/bin/bash
 # generated with coffin v{{ version }}
 # https://github.com/zeroSteiner/workshop/blob/master/tools/coffin
 # compression: {{ compression.name }} encryption: {{ encryption }}
