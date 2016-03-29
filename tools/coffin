@@ -156,7 +156,7 @@ def main():
 			)
 
 		proc_h = subprocess.Popen(
-			['openssl', encryption, '-a', '-in', tmp_archive_path, '-out', tmp_encrypted_path, '-pass', 'stdin'],
+			['openssl', encryption, '-a', '-salt', '-in', tmp_archive_path, '-out', tmp_encrypted_path, '-pass', 'stdin'],
 			stdin=subprocess.PIPE,
 			stdout=subprocess.PIPE,
 			close_fds=True
