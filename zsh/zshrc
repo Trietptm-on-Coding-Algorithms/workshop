@@ -12,9 +12,9 @@ autoload -U zmv
 
 # Set prompts
 if [ "$(whoami)" = 'root' ]; then
-	DEFAULTPROMPT="%{$bg[red]$fg[white]%}%* %c %{$reset_color%}% " # root prompt
+  DEFAULTPROMPT="%{$bg[red]$fg[white]%}%* %c %{$reset_color%}% " # root prompt
 else
-	DEFAULTPROMPT="%{$bg[green]$fg[white]%}%* %c %{$reset_color%}% " # default prompt
+  DEFAULTPROMPT="%{$bg[green]$fg[white]%}%* %c %{$reset_color%}% " # default prompt
 fi
 PROMPT=$DEFAULTPROMPT
 
@@ -23,19 +23,19 @@ bindkey -e
 
 _src_etc_profile_d()
 {
-	#  Make the *.sh things happier, and have possible ~/.zshenv options like
-	# NOMATCH ignored.
-	emulate -L ksh
+  #  Make the *.sh things happier, and have possible ~/.zshenv options like
+  # NOMATCH ignored.
+  emulate -L ksh
 
-	# from bashrc, with zsh fixes
-	if [[ ! -o login ]]; then # We're not a login shell
-		for i in /etc/profile.d/*.sh; do
-		if [ -r "$i" ]; then
-			. $i
-		fi
-		done
-		unset i
-	fi
+  # from bashrc, with zsh fixes
+  if [[ ! -o login ]]; then # We're not a login shell
+    for i in /etc/profile.d/*.sh; do
+    if [ -r "$i" ]; then
+      . $i
+    fi
+    done
+    unset i
+  fi
 }
 _src_etc_profile_d
 
@@ -70,92 +70,97 @@ alias xclipin='xclip -i -selection clipboard'
 alias xclipout='xclip -o -selection clipboard'
 
 # Functions
-github-clone() {
-	git clone git@github.com:$1.git
+function cmv() {
+  mv $1 $2;
+  cd $2
 }
 
 decrypt-file() {
-	if [ ! $(command -v openssl) ]; then
-		print_error "This requires openssl to be installed"
-		return 1
-	fi
-	if [ "$#" -ne 2 ]; then
-		print_status "Usage: encrypt-file [in file] [out file]"
-		return 0
-	fi
-	openssl aes-256-cbc -d -salt -in "$1" -out "$2"
+  if [ ! $(command -v openssl) ]; then
+    print_error "This requires openssl to be installed"
+    return 1
+  fi
+  if [ "$#" -ne 2 ]; then
+    print_status "Usage: encrypt-file [in file] [out file]"
+    return 0
+  fi
+  openssl aes-256-cbc -d -salt -in "$1" -out "$2"
 }
 
 encrypt-file() {
-	if [ ! $(command -v openssl) ]; then
-		print_error "This requires openssl to be installed"
-		return 1
-	fi
-	if [ "$#" -ne 2 ]; then
-		print_status "Usage: encrypt-file [in file] [out file]"
-		return 0
-	fi
-	openssl aes-256-cbc -salt -in "$1" -out "$2"
+  if [ ! $(command -v openssl) ]; then
+    print_error "This requires openssl to be installed"
+    return 1
+  fi
+  if [ "$#" -ne 2 ]; then
+    print_status "Usage: encrypt-file [in file] [out file]"
+    return 0
+  fi
+  openssl aes-256-cbc -salt -in "$1" -out "$2"
+}
+
+github-clone() {
+  git clone git@github.com:$1.git
 }
 
 hash-file() {
-	for file in "$@"; do
-		if [ -f "$file" ]; then
-			echo "hashing: $file";
-			echo "md5  $file $(md5sum $file | awk '{print $1}')";
-			echo "sha1 $file $(sha1sum $file | awk '{print $1}')";
-		else
-			echo "invalid file: $file"
-		fi
-	done
+  for file in "$@"; do
+    if [ -f "$file" ]; then
+      echo "hashing: $file";
+      echo "md5  $file $(md5sum $file | awk '{print $1}')";
+      echo "sha1 $file $(sha1sum $file | awk '{print $1}')";
+    else
+      echo "invalid file: $file"
+    fi
+  done
 }
 
 python-install() {
-	if [ -f "requirements.txt" ]; then
-		pip install -r requirements.txt
-	fi
-	if [ -f "setup.py" ]; then
-		python setup.py build
-		sudo python setup.py install
-	else
-		echo $fg[red]"No setup.py file found"$reset_color
-	fi
-	rm -rf build
+  if [ -f "requirements.txt" ]; then
+    pip install -r requirements.txt
+  fi
+  if [ -f "setup.py" ]; then
+    python setup.py build
+    sudo python setup.py install
+  else
+    echo $fg[red]"No setup.py file found"$reset_color
+  fi
+  rm -rf build
 }
 
 python-test() {
-	if [ ! -f "tests.py" -a ! -f "tests/__init__.py" ]; then
-		echo $fg[red]"No python unit tests found"$reset_color
-		return 0
-	fi
-	ALL_TESTS_PASSED=1
-	if [ -f ".travis.yml" ]; then
-		print_status "Testing based on Travis-CI configuration"
+  if [ ! -f "tests.py" -a ! -f "tests/__init__.py" ]; then
+    echo $fg[red]"No python unit tests found"$reset_color
+    return 0
+  fi
+  ALL_TESTS_PASSED=1
+  if [ -f ".travis.yml" ]; then
+    print_status "Testing based on Travis-CI configuration"
 
-		for version in $(python -m smoke_zephyr.configuration .travis.yml python); do
-			if [ -f "$(which python$version 2>/dev/null)" ]; then
-				print_status "Testing with Python $version"
-				python$version -m unittest -v tests
-				if [ $? -eq 0 ]; then
-					echo "All Python $version tests completed successfully"
-				else
-					echo $fg[red]"Python $version tests did not complete successfully"$reset_color
-					ALL_TESTS_PASSED=0
-				fi
-			else
-				print_warning "Skipping Python $version due to missing binary"
-			fi
-		done
-	else
-		python -m unittest -v tests
-		if [ ! $? -eq 0 ]; then
-			ALL_TESTS_PASSED=0
-		fi
-	fi
-	if [ "$ALL_TESTS_PASSED" -eq 1 ]; then
-		print_good "All tests completed successfully"
-		return 0
-	fi
-	print_error "One or more test failed to complete successfully"
-	return 1
+    for version in $(python -m smoke_zephyr.configuration .travis.yml python); do
+      if [ -f "$(which python$version 2>/dev/null)" ]; then
+        print_status "Testing with Python $version"
+        python$version -m unittest -v tests
+        if [ $? -eq 0 ]; then
+          echo "All Python $version tests completed successfully"
+        else
+          echo $fg[red]"Python $version tests did not complete successfully"$reset_color
+          ALL_TESTS_PASSED=0
+        fi
+      else
+        print_warning "Skipping Python $version due to missing binary"
+      fi
+    done
+  else
+    python -m unittest -v tests
+    if [ ! $? -eq 0 ]; then
+      ALL_TESTS_PASSED=0
+    fi
+  fi
+  if [ "$ALL_TESTS_PASSED" -eq 1 ]; then
+    print_good "All tests completed successfully"
+    return 0
+  fi
+  print_error "One or more test failed to complete successfully"
+  return 1
 }
